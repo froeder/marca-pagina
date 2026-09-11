@@ -1,4 +1,4 @@
-import type { SavedBook, ReadingStatus, GoogleBookItem } from '../types/book';
+import type { SavedBook, ReadingStatus, GoogleBookItem, ReadingGoal } from '../types/book';
 import { sanitizeImageUrl } from '../utils/imageUtils';
 import { doc, setDoc, deleteDoc, collection, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -7,6 +7,8 @@ export { getApiKey, setApiKey } from './googleBooksApi';
 
 const STORAGE_KEY = 'marca_pagina_saved_books';
 const GOAL_KEY = 'marca_pagina_reading_goal';
+const GOALS_KEY = 'marca_pagina_reading_goals';
+const LISTS_KEY = 'marca_pagina_reading_lists';
 
 function cleanObject<T extends Record<string, unknown>>(obj: T): Partial<T> {
   const cleaned: Record<string, unknown> = {};
@@ -68,6 +70,64 @@ export async function syncGoalToFirestore(goal: number, userId?: string): Promis
       );
     } else {
       console.error('Erro ao salvar meta no Firestore:', err);
+    }
+  }
+}
+
+export async function syncGoalsToFirestore(goals: ReadingGoal[], userId?: string): Promise<void> {
+  const uid = userId || auth?.currentUser?.uid;
+  if (!db || !uid) return;
+  try {
+    const goalsCollectionRef = collection(db, 'users', uid, 'goals');
+    const current = await import('firebase/firestore').then((m) =>
+      m.getDocs(goalsCollectionRef)
+    );
+    current.forEach(async (docSnap) => {
+      if (!goals.some((g) => g.id === docSnap.id)) {
+        await deleteDoc(docSnap.ref);
+      }
+    });
+    for (const g of goals) {
+      const ref = doc(goalsCollectionRef, g.id);
+      await setDoc(ref, { ...g, id: g.id }, { merge: true });
+    }
+  } catch (err) {
+    const errorObj = err as { code?: string; message?: string };
+    if (errorObj?.code === 'permission-denied') {
+      console.warn(
+        'Firestore: Permissão negada ao salvar metas. Atualize as regras de segurança (firestore.rules) no Firebase Console.'
+      );
+    } else {
+      console.error('Erro ao salvar metas no Firestore:', err);
+    }
+  }
+}
+
+export async function syncListsToFirestore(lists: string[], userId?: string): Promise<void> {
+  const uid = userId || auth?.currentUser?.uid;
+  if (!db || !uid) return;
+  try {
+    const listsCollectionRef = collection(db, 'users', uid, 'readingLists');
+    const current = await import('firebase/firestore').then((m) =>
+      m.getDocs(listsCollectionRef)
+    );
+    current.forEach(async (docSnap) => {
+      if (!lists.includes(docSnap.id)) {
+        await deleteDoc(docSnap.ref);
+      }
+    });
+    for (const name of lists) {
+      const ref = doc(listsCollectionRef, name);
+      await setDoc(ref, { name }, { merge: true });
+    }
+  } catch (err) {
+    const errorObj = err as { code?: string; message?: string };
+    if (errorObj?.code === 'permission-denied') {
+      console.warn(
+        'Firestore: Permissão negada ao salvar listas. Atualize as regras de segurança (firestore.rules) no Firebase Console.'
+      );
+    } else {
+      console.error('Erro ao salvar listas no Firestore:', err);
     }
   }
 }
@@ -297,4 +357,158 @@ export function importLibraryJson(jsonString: string): boolean {
 export function resetToDemoBooks(): void {
   saveBooks(INITIAL_DEMO_BOOKS);
   INITIAL_DEMO_BOOKS.forEach((b) => syncBookToFirestore(b));
+}
+
+/* ------------------------------------------------------------------ */
+/* Listas personalizadas da estante                                    */
+/* ------------------------------------------------------------------ */
+
+export function getReadingLists(): string[] {
+  try {
+    const raw = localStorage.getItem(LISTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((n) => typeof n === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveReadingLists(lists: string[]): void {
+  localStorage.setItem(LISTS_KEY, JSON.stringify(lists));
+  window.dispatchEvent(new Event('marca_pagina_lists_updated'));
+  syncListsToFirestore(lists);
+}
+
+export function createReadingList(name: string): boolean {
+  const trimmed = name.trim();
+  if (!trimmed) return false;
+  const lists = getReadingLists();
+  if (lists.includes(trimmed)) return false;
+  lists.push(trimmed);
+  saveReadingLists(lists);
+  return true;
+}
+
+export function renameReadingList(oldName: string, newName: string): boolean {
+  const trimmed = newName.trim();
+  if (!trimmed || trimmed === oldName) return false;
+  const lists = getReadingLists();
+  if (lists.includes(trimmed)) return false;
+  const updated = lists.map((n) => (n === oldName ? trimmed : n));
+  // Atualiza a referência nos livros associados
+  const books = getSavedBooks();
+  let changed = false;
+  for (const b of books) {
+    if (b.lists?.includes(oldName)) {
+      b.lists = b.lists.map((n) => (n === oldName ? trimmed : n));
+      changed = true;
+    }
+  }
+  if (changed) {
+    saveBooks(books);
+    books.forEach((b) => syncBookToFirestore(b));
+  }
+  if (JSON.stringify(updated) !== JSON.stringify(lists)) {
+    saveReadingLists(updated);
+  }
+  return true;
+}
+
+export function deleteReadingList(name: string): void {
+  saveReadingLists(getReadingLists().filter((n) => n !== name));
+  const books = getSavedBooks();
+  let removed = false;
+  for (const b of books) {
+    if (b.lists?.includes(name)) {
+      b.lists = b.lists.filter((n) => n !== name);
+      removed = true;
+    }
+  }
+  if (removed) {
+    saveBooks(books);
+    books.forEach((b) => syncBookToFirestore(b));
+  }
+}
+
+export function getBookLists(id: string): string[] {
+  const book = getSavedBooks().find((b) => b.id === id);
+  return book?.lists || [];
+}
+
+export function toggleBookList(id: string, listName: string): SavedBook | null {
+  const books = getSavedBooks();
+  const index = books.findIndex((b) => b.id === id);
+  if (index === -1) return null;
+  const lists = books[index].lists || [];
+  const next = lists.includes(listName)
+    ? lists.filter((n) => n !== listName)
+    : [...lists, listName];
+  books[index].lists = next;
+  saveBooks(books);
+  syncBookToFirestore(books[index]);
+  return books[index];
+}
+
+/* ------------------------------------------------------------------ */
+/* Metas personalizadas de leitura                                     */
+/* ------------------------------------------------------------------ */
+
+function getDefaultGoals(): ReadingGoal[] {
+  return [];
+}
+
+export function getReadingGoals(): ReadingGoal[] {
+  try {
+    const raw = localStorage.getItem(GOALS_KEY);
+    if (!raw) return getDefaultGoals();
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as ReadingGoal[]) : getDefaultGoals();
+  } catch {
+    return getDefaultGoals();
+  }
+}
+
+function saveReadingGoals(goals: ReadingGoal[]): void {
+  localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
+  window.dispatchEvent(new Event('marca_pagina_goals_updated'));
+  syncGoalsToFirestore(goals);
+}
+
+export function createReadingGoal(label: string, target: number, unit: ReadingGoal['unit']): ReadingGoal | null {
+  const trimmedLabel = label.trim();
+  if (!trimmedLabel || target <= 0) return null;
+  const goals = getReadingGoals();
+  const goal: ReadingGoal = {
+    id: `goal_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
+    label: trimmedLabel,
+    target,
+    unit,
+  };
+  goals.push(goal);
+  saveReadingGoals(goals);
+  return goal;
+}
+
+export function updateReadingGoal(id: string, label: string, target: number, unit: ReadingGoal['unit']): ReadingGoal | null {
+  const goals = getReadingGoals();
+  const index = goals.findIndex((g) => g.id === id);
+  if (index === -1 || target <= 0) return null;
+  const trimmedLabel = label.trim();
+  goals[index] = { ...goals[index], label: trimmedLabel || goals[index].label, target, unit };
+  saveReadingGoals(goals);
+  return goals[index];
+}
+
+export function deleteReadingGoal(id: string): void {
+  saveReadingGoals(getReadingGoals().filter((g) => g.id !== id));
+}
+
+/* Readers for goals progress */
+export function countReadBooks(): number {
+  return getReadBooks().length;
+}
+
+export function countPagesRead(): number {
+  return getReadBooks().reduce((acc, b) => acc + (b.pageCount || 0), 0);
 }

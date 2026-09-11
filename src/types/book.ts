@@ -56,8 +56,19 @@ export interface SavedBook {
   dateAdded: string;
   dateFinished?: string;
   favorite?: boolean;
+  /** Nomes das listas personalizadas a que este livro pertence. */
+  lists?: string[];
   previewLink?: string;
   infoLink?: string;
+}
+
+export type ReadingGoalUnit = 'books' | 'pages';
+
+export interface ReadingGoal {
+  id: string;
+  label: string;
+  target: number;
+  unit: ReadingGoalUnit;
 }
 
 export interface CategoryStat {

@@ -11,6 +11,16 @@ service cloud.firestore {
       match /books/{bookId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // O usuário pode ler e gravar suas listas personalizadas
+      match /readingLists/{listId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // O usuário pode ler e gravar suas metas personalizadas de leitura
+      match /goals/{goalId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
   }
 }

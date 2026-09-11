@@ -3,12 +3,14 @@ import type { GoogleBookItem, SavedBook, ReadingStatus } from '../types/book';
 import { formatAuthors, formatYear } from '../utils/formatters';
 import { sanitizeImageUrl, getBookCoverFallback } from '../utils/imageUtils';
 import { CategoryBadge } from './CategoryBadge';
-import { Heart, Star, CheckCircle, Clock, Bookmark, Trash2 } from 'lucide-react';
+import { Heart, Star, CheckCircle, Clock, Bookmark, Trash2, Layers } from 'lucide-react';
 
 interface BookCardProps {
   book: GoogleBookItem | SavedBook;
   isSaved?: boolean;
   savedData?: SavedBook;
+  lists?: string[];
+  onToggleList?: (bookId: string, listName: string) => void;
   onStatusChange?: (book: GoogleBookItem | SavedBook, status: ReadingStatus) => void;
   onToggleFavorite?: (id: string) => void;
   onOpenDetails?: (book: GoogleBookItem | SavedBook) => void;
@@ -16,7 +18,7 @@ interface BookCardProps {
 }
 
 export const BookCard: React.FC<BookCardProps> = ({
-  book, isSaved, savedData, onStatusChange, onToggleFavorite, onOpenDetails, onRemove
+  book, isSaved, savedData, lists, onToggleList, onStatusChange, onToggleFavorite, onOpenDetails, onRemove
 }) => {
   const isG = 'volumeInfo' in book;
   const title = isG ? book.volumeInfo.title : book.title;
@@ -30,6 +32,8 @@ export const BookCard: React.FC<BookCardProps> = ({
   const status: ReadingStatus | undefined = savedData?.status || (!isG ? book.status : undefined);
   const isFav = savedData?.favorite || (!isG ? book.favorite : false);
   const rating = savedData?.userRating || (!isG ? book.userRating : undefined);
+  const bookLists = savedData?.lists || [];
+  const availableLists = lists || [];
 
   return (
     <div className="group bg-white rounded-xl border border-[#E6DCCF] hover:border-[#D3BC9E] shadow-[0_1px_3px_rgba(44,31,19,0.04)] hover:shadow-[0_8px_20px_-4px_rgba(44,31,19,0.08)] transition-all duration-200 flex flex-col h-full overflow-hidden">
@@ -106,6 +110,39 @@ export const BookCard: React.FC<BookCardProps> = ({
                 className={`w-3 h-3 ${s <= rating ? 'text-amber-500 fill-amber-500' : 'text-[#E6DCCF]'}`}
               />
             ))}
+          </div>
+        )}
+
+        {/* LISTAS */}
+        {(isSaved && (bookLists.length > 0 || availableLists.length > 0)) && (
+          <div className="mt-2 flex-1 flex flex-wrap items-center gap-1">
+            {bookLists.map((listName) => (
+              <span
+                key={listName}
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#F4ECE1] border border-[#E6D7C3] text-[9px] font-medium text-[#7F5E3B]"
+              >
+                <Layers className="w-2.5 h-2.5" />
+                {listName}
+              </span>
+            ))}
+            {onToggleList && availableLists.length > 0 && (
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value) onToggleList(book.id, e.target.value);
+                }}
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Adicionar à lista"
+                className="ml-auto text-[9px] py-0.5 px-1 rounded border border-[#E6DCCF] bg-white text-[#6A5A50] focus:outline-none focus:border-[#422F1D] cursor-pointer"
+              >
+                <option value="">+ Lista</option>
+                {availableLists.map((name) => (
+                  <option key={name} value={name}>
+                    {bookLists.includes(name) ? 'Remover de ' : 'Adicionar a '}{name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         )}
 
