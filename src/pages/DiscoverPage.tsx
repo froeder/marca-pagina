@@ -97,29 +97,29 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      <div className="relative overflow-hidden rounded-2xl bg-zinc-900 text-white p-6 sm:p-8 shadow-sm border border-zinc-800">
+      <div className="relative overflow-hidden rounded-2xl bg-[#382A24] text-[#FAF6F0] p-6 sm:p-8 shadow-sm border border-[#2C1F13]">
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-md bg-zinc-800 text-zinc-300 text-xs font-medium uppercase tracking-wider mb-3 border border-zinc-700/60">
-            <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
+          <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-md bg-[#4D3B33] text-[#D3BC9E] text-xs font-medium uppercase tracking-wider mb-3 border border-[#5F483E]">
+            <Sparkles className="w-3.5 h-3.5 text-[#D3BC9E]" />
             <span>Motor de Recomendação Inteligente</span>
           </div>
-          <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+          <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-[#FAF6F0] tracking-tight">
             Descoberta por Padrões
           </h1>
-          <p className="mt-2.5 text-zinc-400 text-xs sm:text-sm leading-relaxed">
+          <p className="mt-2.5 text-[#D3BC9E] text-xs sm:text-sm leading-relaxed">
             Seu histórico de leitura define sua próxima grande descoberta. Analisamos os assuntos mais frequentes dos livros que você já leu e buscamos sugestões precisas na Google Books API.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
             <button
               onClick={onNavigateToSearch}
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-white hover:bg-zinc-100 text-zinc-900 text-xs font-semibold transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-[#FAF6F0] hover:bg-white text-[#2D241E] text-xs font-semibold transition-all shadow-xs cursor-pointer"
             >
               <Compass className="w-3.5 h-3.5" />
               <span>Buscar Livros</span>
             </button>
             <button
               onClick={onNavigateToMyBooks}
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-all border border-zinc-700 cursor-pointer"
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-[#4D3B33] hover:bg-[#5F483E] text-[#FAF6F0] text-xs font-medium transition-all border border-[#5F483E] cursor-pointer"
             >
               <Library className="w-3.5 h-3.5" />
               <span>Minha Estante ({savedBooks.length})</span>
@@ -140,13 +140,13 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
       <div>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="font-sans font-bold text-lg sm:text-xl text-zinc-900 flex items-center gap-2">
+            <h2 className="font-sans font-bold text-lg sm:text-xl text-[#2D241E] flex items-center gap-2">
               <span>Sugestões Personalizadas</span>
-              <span className="text-[11px] font-mono font-medium bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-md border border-zinc-200">
+              <span className="text-[11px] font-mono font-medium bg-[#F4ECE1] text-[#5F442A] px-2 py-0.5 rounded-md border border-[#E6DCCF]">
                 {recommendedBooks.length} obras
               </span>
             </h2>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-xs text-[#7D6E65] mt-0.5">
               Obras recomendadas a partir do seu perfil de leitura
             </p>
           </div>
@@ -154,8 +154,8 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
 
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center space-y-2.5">
-            <Loader2 className="w-6 h-6 text-zinc-900 animate-spin" />
-            <p className="text-xs font-medium text-zinc-500">
+            <Loader2 className="w-6 h-6 text-[#422F1D] animate-spin" />
+            <p className="text-xs font-medium text-[#7D6E65]">
               Consultando a Google Books API com base nos seus padrões...
             </p>
           </div>
@@ -170,13 +170,13 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
             </button>
           </div>
         ) : recommendedBooks.length === 0 ? (
-          <div className="p-8 bg-white rounded-xl border border-zinc-200 text-center space-y-2.5">
-            <p className="text-sm font-medium text-zinc-700">
+          <div className="p-8 bg-white rounded-xl border border-[#E6DCCF] text-center space-y-2.5">
+            <p className="text-sm font-medium text-[#2D241E]">
               Nenhuma recomendação encontrada para o padrão atual.
             </p>
             <button
               onClick={onNavigateToSearch}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-900 hover:underline cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#422F1D] hover:underline cursor-pointer"
             >
               Ir para Busca de Livros <ArrowRight className="w-3.5 h-3.5" />
             </button>

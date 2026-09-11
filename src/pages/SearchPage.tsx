@@ -76,36 +76,36 @@ export const SearchPage: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       <div className="text-center max-w-2xl mx-auto pt-2">
-        <h1 className="font-sans font-bold text-2xl sm:text-3xl text-zinc-900 tracking-tight">
+        <h1 className="font-sans font-bold text-2xl sm:text-3xl text-[#2D241E] tracking-tight">
           Buscar no Acervo
         </h1>
-        <p className="text-zinc-500 text-xs sm:text-sm mt-1.5">
+        <p className="text-[#7D6E65] text-xs sm:text-sm mt-1.5">
           Consulte milhões de títulos em Português indexados pela Google Books API.
         </p>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <form onSubmit={onSubmit} className="relative flex items-center shadow-sm rounded-xl bg-white border border-zinc-200 focus-within:border-zinc-900 focus-within:ring-1 focus-within:ring-zinc-900 transition-all">
-          <Search className="w-4 h-4 text-zinc-400 ml-3.5 shrink-0" />
+        <form onSubmit={onSubmit} className="relative flex items-center shadow-sm rounded-xl bg-white border border-[#E6DCCF] focus-within:border-[#422F1D] focus-within:ring-1 focus-within:ring-[#422F1D] transition-all">
+          <Search className="w-4 h-4 text-[#8C7D73] ml-3.5 shrink-0" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Digite o título, autor ou assunto (ex: Machado de Assis, Ficção)..."
-            className="w-full py-3 px-3 text-zinc-900 placeholder:text-zinc-400 bg-transparent text-xs sm:text-sm focus:outline-none"
+            className="w-full py-3 px-3 text-[#2D241E] placeholder:text-[#A89B91] bg-transparent text-xs sm:text-sm focus:outline-none"
           />
           <button
             type="submit"
             disabled={loading || !query.trim()}
-            className="mr-2 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+            className="mr-2 px-4 py-2 rounded-lg bg-[#422F1D] hover:bg-[#2C1F13] text-[#FAF6F0] font-medium text-xs transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Buscar'}
           </button>
         </form>
 
         <div className="mt-3.5 flex flex-wrap items-center justify-center gap-1.5">
-          <span className="text-[11px] text-zinc-500 font-medium mr-1 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-zinc-400" /> Sugestões:
+          <span className="text-[11px] text-[#7D6E65] font-medium mr-1 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-[#A05E35]" /> Sugestões:
           </span>
           {SUGGESTED_QUERIES.map((item) => (
             <button
@@ -115,7 +115,7 @@ export const SearchPage: React.FC = () => {
                 setQuery(item);
                 handleSearch(item);
               }}
-              className="text-[11px] px-2.5 py-0.5 rounded-md bg-zinc-100/80 hover:bg-zinc-200/80 text-zinc-700 border border-zinc-200 transition-colors cursor-pointer"
+              className="text-[11px] px-2.5 py-0.5 rounded-md bg-[#F4ECE1] hover:bg-[#E6D7C3] text-[#5F442A] border border-[#E6DCCF] transition-colors cursor-pointer"
             >
               {item}
             </button>
@@ -126,8 +126,8 @@ export const SearchPage: React.FC = () => {
       <div>
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center space-y-2.5">
-            <Loader2 className="w-6 h-6 text-zinc-900 animate-spin" />
-            <p className="text-xs font-medium text-zinc-500">Buscando na Google Books API com langRestrict=pt...</p>
+            <Loader2 className="w-6 h-6 text-[#422F1D] animate-spin" />
+            <p className="text-xs font-medium text-[#7D6E65]">Buscando na Google Books API com langRestrict=pt...</p>
           </div>
         ) : error ? (
           <div className="p-5 bg-rose-50/70 border border-rose-200 rounded-xl text-center max-w-lg mx-auto">
@@ -135,15 +135,15 @@ export const SearchPage: React.FC = () => {
             <p className="text-xs font-medium text-rose-700">{error}</p>
           </div>
         ) : hasSearched && results.length === 0 ? (
-          <div className="p-10 text-center bg-white rounded-xl border border-zinc-200 max-w-md mx-auto">
-            <BookOpen className="w-8 h-8 text-zinc-300 mx-auto mb-2" />
-            <p className="font-sans font-semibold text-zinc-800 text-sm">Nenhum livro encontrado</p>
-            <p className="text-xs text-zinc-500 mt-0.5">Tente pesquisar com outros termos ou autores.</p>
+          <div className="p-10 text-center bg-white rounded-xl border border-[#E6DCCF] max-w-md mx-auto">
+            <BookOpen className="w-8 h-8 text-[#D3BC9E] mx-auto mb-2" />
+            <p className="font-sans font-semibold text-[#2D241E] text-sm">Nenhum livro encontrado</p>
+            <p className="text-xs text-[#7D6E65] mt-0.5">Tente pesquisar com outros termos ou autores.</p>
           </div>
         ) : results.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-medium text-zinc-500">
+              <span className="text-xs font-medium text-[#7D6E65]">
                 {results.length} livros encontrados para "{query}"
               </span>
             </div>

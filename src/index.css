@@ -2,17 +2,17 @@
 
 @layer theme {
   :root {
-    --color-brand-50: #f8fafc;
-    --color-brand-100: #f1f5f9;
-    --color-brand-200: #e2e8f0;
-    --color-brand-300: #cbd5e1;
-    --color-brand-400: #94a3b8;
-    --color-brand-500: #64748b;
-    --color-brand-600: #475569;
-    --color-brand-700: #334155;
-    --color-brand-800: #1e293b;
-    --color-brand-900: #0f172a;
-    --color-brand-950: #020617;
+    --color-brand-50: #FAF6F0;
+    --color-brand-100: #F4ECE1;
+    --color-brand-200: #E6D7C3;
+    --color-brand-300: #D3BC9E;
+    --color-brand-400: #BA9B77;
+    --color-brand-500: #9E7B54;
+    --color-brand-600: #7F5E3B;
+    --color-brand-700: #5F442A;
+    --color-brand-800: #422F1D;
+    --color-brand-900: #2C1F13;
+    --color-brand-950: #1C130A;
     --font-serif: "Newsreader", Georgia, Cambria, "Times New Roman", Times, serif;
     --font-sans: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
   }
@@ -26,26 +26,26 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #fafafa;
-  color: #18181b;
+  background-color: #F8F5EE;
+  color: #2D241E;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Minimalist scrollbars */
+/* Minimalist warm scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #e4e4e7;
+  background: #DDD3C4;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4d4d8;
+  background: #C4B7A2;
 }
 
 

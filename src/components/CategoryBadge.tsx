@@ -24,8 +24,8 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
         onClick={onClick}
         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer ${
           selected
-            ? 'bg-zinc-900 text-white border-zinc-900 shadow-xs'
-            : `${color.bg} ${color.border} hover:border-zinc-400 hover:text-zinc-900`
+            ? 'bg-[#422F1D] text-[#FAF6F0] border-[#422F1D] shadow-xs'
+            : `${color.bg} ${color.border} hover:border-[#BA9B77] hover:text-[#2D241E]`
         } ${className}`}
       >
         {displayName}

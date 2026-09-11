@@ -76,29 +76,29 @@ export function getCategoryColor(category: string): { bg: string; text: string; 
   const normalized = normalizeCategoryName(category).toLowerCase();
   
   if (normalized.includes('ficção') || normalized.includes('fantasia')) {
-    return { bg: 'bg-violet-50/80 text-violet-700', text: 'text-violet-700', border: 'border-violet-200/80' };
+    return { bg: 'bg-[#F7EBE5] text-[#8C381B]', text: 'text-[#8C381B]', border: 'border-[#ECD5C8]' };
   }
   if (normalized.includes('tecnologia') || normalized.includes('comput')) {
-    return { bg: 'bg-sky-50/80 text-sky-700', text: 'text-sky-700', border: 'border-sky-200/80' };
+    return { bg: 'bg-[#EDEBE8] text-[#4A423B]', text: 'text-[#4A423B]', border: 'border-[#DDD8D1]' };
   }
   if (normalized.includes('filosofia') || normalized.includes('história')) {
-    return { bg: 'bg-amber-50/80 text-amber-800', text: 'text-amber-800', border: 'border-amber-200/80' };
+    return { bg: 'bg-[#FAF1DF] text-[#87581B]', text: 'text-[#87581B]', border: 'border-[#EEDDBF]' };
   }
   if (normalized.includes('desenvolvimento') || normalized.includes('psicologia')) {
-    return { bg: 'bg-emerald-50/80 text-emerald-700', text: 'text-emerald-700', border: 'border-emerald-200/80' };
+    return { bg: 'bg-[#F0F4EC] text-[#4B6B38]', text: 'text-[#4B6B38]', border: 'border-[#DCE5D3]' };
   }
   if (normalized.includes('negócios') || normalized.includes('economia')) {
-    return { bg: 'bg-blue-50/80 text-blue-700', text: 'text-blue-700', border: 'border-blue-200/80' };
+    return { bg: 'bg-[#F4ECE3] text-[#784B20]', text: 'text-[#784B20]', border: 'border-[#E5D7C7]' };
   }
   if (normalized.includes('biografia')) {
-    return { bg: 'bg-orange-50/80 text-orange-700', text: 'text-orange-700', border: 'border-orange-200/80' };
+    return { bg: 'bg-[#FDF0E2] text-[#9A551E]', text: 'text-[#9A551E]', border: 'border-[#F6DCBF]' };
   }
   if (normalized.includes('ciência')) {
-    return { bg: 'bg-teal-50/80 text-teal-700', text: 'text-teal-700', border: 'border-teal-200/80' };
+    return { bg: 'bg-[#EDF4F1] text-[#346554]', text: 'text-[#346554]', border: 'border-[#D4E5DF]' };
   }
   if (normalized.includes('terror') || normalized.includes('suspense')) {
-    return { bg: 'bg-rose-50/80 text-rose-700', text: 'text-rose-700', border: 'border-rose-200/80' };
+    return { bg: 'bg-[#F9ECEC] text-[#8A3333]', text: 'text-[#8A3333]', border: 'border-[#F0D0D0]' };
   }
   
-  return { bg: 'bg-zinc-100/80 text-zinc-700', text: 'text-zinc-700', border: 'border-zinc-200/80' };
+  return { bg: 'bg-[#F4ECE1] text-[#5F442A]', text: 'text-[#5F442A]', border: 'border-[#E6D7C3]' };
 }

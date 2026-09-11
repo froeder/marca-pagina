@@ -32,9 +32,9 @@ export const BookCard: React.FC<BookCardProps> = ({
   const rating = savedData?.userRating || (!isG ? book.userRating : undefined);
 
   return (
-    <div className="group bg-white rounded-xl border border-zinc-200/80 hover:border-zinc-300 shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08)] transition-all duration-200 flex flex-col h-full overflow-hidden">
+    <div className="group bg-white rounded-xl border border-[#E6DCCF] hover:border-[#D3BC9E] shadow-[0_1px_3px_rgba(44,31,19,0.04)] hover:shadow-[0_8px_20px_-4px_rgba(44,31,19,0.08)] transition-all duration-200 flex flex-col h-full overflow-hidden">
       {/* COVER */}
-      <div className="relative pt-[132%] bg-zinc-100 overflow-hidden cursor-pointer" onClick={() => onOpenDetails?.(book)}>
+      <div className="relative pt-[132%] bg-[#F4ECE1] overflow-hidden cursor-pointer" onClick={() => onOpenDetails?.(book)}>
         <img
           src={imgSrc}
           alt={title}
@@ -49,7 +49,7 @@ export const BookCard: React.FC<BookCardProps> = ({
             className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition-all cursor-pointer ${
               isFav
                 ? 'bg-rose-500 text-white shadow-xs'
-                : 'bg-white/80 text-zinc-600 hover:bg-white hover:text-zinc-900'
+                : 'bg-white/80 text-[#6A5A50] hover:bg-white hover:text-[#2D241E]'
             }`}
           >
             <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-current' : ''}`} />
@@ -59,10 +59,10 @@ export const BookCard: React.FC<BookCardProps> = ({
           <div className="absolute top-2 left-2">
             <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shadow-xs ${
               status === 'lido'
-                ? 'bg-zinc-900 text-white'
+                ? 'bg-[#422F1D] text-[#FAF6F0]'
                 : status === 'lendo'
-                ? 'bg-amber-600 text-white'
-                : 'bg-blue-600 text-white'
+                ? 'bg-[#C87A3D] text-white'
+                : 'bg-[#7F5E3B] text-white'
             }`}>
               {status === 'lido' ? 'Lido' : status === 'lendo' ? 'Lendo' : 'Quero'}
             </span>
@@ -82,17 +82,17 @@ export const BookCard: React.FC<BookCardProps> = ({
 
         <h3
           onClick={() => onOpenDetails?.(book)}
-          className="font-sans font-semibold text-zinc-900 text-xs sm:text-sm line-clamp-2 cursor-pointer hover:text-zinc-600 transition-colors leading-snug"
+          className="font-sans font-semibold text-[#2D241E] text-xs sm:text-sm line-clamp-2 cursor-pointer hover:text-[#7F5E3B] transition-colors leading-snug"
           title={title}
         >
           {title}
         </h3>
 
-        <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5 line-clamp-1">
+        <p className="text-[11px] sm:text-xs text-[#7D6E65] mt-0.5 line-clamp-1">
           {formatAuthors(authors)}
         </p>
 
-        <div className="flex items-center text-[10px] sm:text-[11px] text-zinc-400 gap-1.5 mt-1">
+        <div className="flex items-center text-[10px] sm:text-[11px] text-[#A89B91] gap-1.5 mt-1">
           {pubDate && <span>{formatYear(pubDate)}</span>}
           {pubDate && pages && <span>•</span>}
           {pages && <span>{pages} pág.</span>}
@@ -103,21 +103,21 @@ export const BookCard: React.FC<BookCardProps> = ({
             {[1, 2, 3, 4, 5].map((s) => (
               <Star
                 key={s}
-                className={`w-3 h-3 ${s <= rating ? 'text-amber-400 fill-amber-400' : 'text-zinc-200'}`}
+                className={`w-3 h-3 ${s <= rating ? 'text-amber-500 fill-amber-500' : 'text-[#E6DCCF]'}`}
               />
             ))}
           </div>
         )}
 
         {/* ACTIONS */}
-        <div className="mt-auto pt-2.5 border-t border-zinc-100 flex flex-col gap-1">
-          <div className="grid grid-cols-3 gap-0.5 sm:gap-1 bg-zinc-50 p-0.5 rounded-lg border border-zinc-100">
+        <div className="mt-auto pt-2.5 border-t border-[#F2ECE4] flex flex-col gap-1">
+          <div className="grid grid-cols-3 gap-0.5 sm:gap-1 bg-[#F8F5EE] p-0.5 rounded-lg border border-[#E6DCCF]">
             <button
               onClick={() => onStatusChange?.(book, 'lido')}
               className={`py-1 rounded-md text-[9px] sm:text-[10px] font-medium flex items-center justify-center gap-0.5 sm:gap-1 transition-all cursor-pointer ${
                 status === 'lido'
-                  ? 'bg-zinc-900 text-white shadow-xs font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                  ? 'bg-[#422F1D] text-[#FAF6F0] shadow-xs font-semibold'
+                  : 'text-[#6A5A50] hover:text-[#2D241E] hover:bg-[#EAE3D8]'
               }`}
             >
               <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -127,8 +127,8 @@ export const BookCard: React.FC<BookCardProps> = ({
               onClick={() => onStatusChange?.(book, 'lendo')}
               className={`py-1 rounded-md text-[9px] sm:text-[10px] font-medium flex items-center justify-center gap-0.5 sm:gap-1 transition-all cursor-pointer ${
                 status === 'lendo'
-                  ? 'bg-amber-600 text-white shadow-xs font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                  ? 'bg-[#C87A3D] text-white shadow-xs font-semibold'
+                  : 'text-[#6A5A50] hover:text-[#2D241E] hover:bg-[#EAE3D8]'
               }`}
             >
               <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -138,8 +138,8 @@ export const BookCard: React.FC<BookCardProps> = ({
               onClick={() => onStatusChange?.(book, 'quero_ler')}
               className={`py-1 rounded-md text-[9px] sm:text-[10px] font-medium flex items-center justify-center gap-0.5 sm:gap-1 transition-all cursor-pointer ${
                 status === 'quero_ler'
-                  ? 'bg-blue-600 text-white shadow-xs font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                  ? 'bg-[#7F5E3B] text-white shadow-xs font-semibold'
+                  : 'text-[#6A5A50] hover:text-[#2D241E] hover:bg-[#EAE3D8]'
               }`}
             >
               <Bookmark className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -150,7 +150,7 @@ export const BookCard: React.FC<BookCardProps> = ({
           {isSaved && onRemove && (
             <button
               onClick={() => onRemove(book.id)}
-              className="text-[10px] text-zinc-400 hover:text-rose-600 py-0.5 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+              className="text-[10px] text-[#A89B91] hover:text-rose-600 py-0.5 flex items-center justify-center gap-1 transition-colors cursor-pointer"
             >
               <Trash2 className="w-2.5 h-2.5" />
               <span>Remover</span>
