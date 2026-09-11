@@ -186,7 +186,12 @@ export const BookCard: React.FC<BookCardProps> = ({
 
           {isSaved && onRemove && (
             <button
-              onClick={() => onRemove(book.id)}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onRemove(book.id);
+              }}
               className="text-[10px] text-[#A89B91] hover:text-rose-600 py-0.5 flex items-center justify-center gap-1 transition-colors cursor-pointer"
             >
               <Trash2 className="w-2.5 h-2.5" />

@@ -3,7 +3,7 @@ import type { GoogleBookItem, SavedBook, ReadingStatus } from '../types/book';
 import { formatAuthors, formatYear } from '../utils/formatters';
 import { sanitizeImageUrl, getBookCoverFallback } from '../utils/imageUtils';
 import { CategoryBadge } from './CategoryBadge';
-import { X, ExternalLink, Star, CheckCircle, Clock, Bookmark, Heart, BookOpen } from 'lucide-react';
+import { X, ExternalLink, Star, CheckCircle, Clock, Bookmark, Heart, BookOpen, Trash2 } from 'lucide-react';
 
 interface Props {
   book: GoogleBookItem | SavedBook | null;
@@ -12,6 +12,7 @@ interface Props {
   onStatusChange: (b: GoogleBookItem | SavedBook, s: ReadingStatus) => void;
   onSaveReview?: (id: string, rating?: number, notes?: string) => void;
   onToggleFavorite?: (id: string) => void;
+  onRemove?: (id: string) => void;
 }
 export const BookDetailModalInner: React.FC<{
   book: GoogleBookItem | SavedBook;
@@ -20,8 +21,9 @@ export const BookDetailModalInner: React.FC<{
   onStatusChange: (b: GoogleBookItem | SavedBook, s: ReadingStatus) => void;
   onSaveReview?: (id: string, rating?: number, notes?: string) => void;
   onToggleFavorite?: (id: string) => void;
+  onRemove?: (id: string) => void;
 }> = ({
-  book, savedData, onClose, onStatusChange, onSaveReview, onToggleFavorite
+  book, savedData, onClose, onStatusChange, onSaveReview, onToggleFavorite, onRemove
 }) => {
   const isG = 'volumeInfo' in book;
   const title = isG ? book.volumeInfo.title : book.title;
@@ -129,19 +131,36 @@ export const BookDetailModalInner: React.FC<{
               </button>
             </div>
 
-            {onToggleFavorite && (
-              <button
-                onClick={() => onToggleFavorite(book.id)}
-                className={`mt-2 text-xs font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
-                  isFav
-                    ? 'bg-rose-50 text-rose-700 border-rose-200'
-                    : 'bg-[#F8F5EE] text-[#6A5A50] border-[#E6DCCF] hover:bg-[#F4ECE1] hover:text-[#2D241E]'
-                }`}
-              >
-                <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-rose-500 text-rose-500' : ''}`} />
-                <span>{isFav ? 'Favoritado' : 'Favoritar'}</span>
-              </button>
-            )}
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
+              {onToggleFavorite && (
+                <button
+                  type="button"
+                  onClick={() => onToggleFavorite(book.id)}
+                  className={`text-xs font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                    isFav
+                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                      : 'bg-[#F8F5EE] text-[#6A5A50] border-[#E6DCCF] hover:bg-[#F4ECE1] hover:text-[#2D241E]'
+                  }`}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-rose-500 text-rose-500' : ''}`} />
+                  <span>{isFav ? 'Favoritado' : 'Favoritar'}</span>
+                </button>
+              )}
+
+              {onRemove && (savedData || !isG) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onRemove(book.id);
+                    onClose();
+                  }}
+                  className="text-xs font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Remover da Estante</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

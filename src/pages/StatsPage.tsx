@@ -164,7 +164,11 @@ export const StatsPage: React.FC<{ onNavigateToDiscover: () => void }> = ({ onNa
                             <TrendingUp className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => handleDeleteGoal(g.id)}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteGoal(g.id);
+                            }}
                             aria-label={`Excluir ${g.label}`}
                             className="p-1.5 rounded-lg text-[#D3BC9E] hover:text-rose-400 hover:bg-[#5F483E] transition-colors cursor-pointer"
                           >

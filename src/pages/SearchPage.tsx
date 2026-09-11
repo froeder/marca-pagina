@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { GoogleBookItem, SavedBook, ReadingStatus } from '../types/book';
 import { searchBooks } from '../services/googleBooksApi';
-import { getSavedBooks, addOrUpdateFromGoogleBook, updateBookStatus, toggleFavorite, updateBookReview } from '../services/storageService';
+import { getSavedBooks, addOrUpdateFromGoogleBook, updateBookStatus, toggleFavorite, updateBookReview, removeBook } from '../services/storageService';
 import { BookCard } from '../components/BookCard';
 import { BookDetailModal } from '../components/BookDetailModal';
 import { Search, Loader2, Sparkles, BookOpen, AlertCircle, X } from 'lucide-react';
@@ -116,6 +116,14 @@ export const SearchPage: React.FC = () => {
     setSavedBooks(getSavedBooks());
   };
 
+  const handleRemove = (id: string) => {
+    removeBook(id);
+    setSavedBooks(getSavedBooks());
+    if (selectedBook && selectedBook.id === id) {
+      setSelectedBook(null);
+    }
+  };
+
   const handleSaveReview = (id: string, rating?: number, notes?: string) => {
     updateBookReview(id, rating, notes);
     setSavedBooks(getSavedBooks());
@@ -221,6 +229,7 @@ export const SearchPage: React.FC = () => {
                     savedData={savedData}
                     onStatusChange={handleStatusChange}
                     onToggleFavorite={handleToggleFavorite}
+                    onRemove={handleRemove}
                     onOpenDetails={(b) => setSelectedBook(b)}
                   />
                 );
@@ -238,6 +247,7 @@ export const SearchPage: React.FC = () => {
           onStatusChange={handleStatusChange}
           onSaveReview={handleSaveReview}
           onToggleFavorite={handleToggleFavorite}
+          onRemove={handleRemove}
         />
       )}
     </div>

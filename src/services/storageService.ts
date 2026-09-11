@@ -147,20 +147,27 @@ export function initFirestoreSync(userId: string): () => void {
   unsubscribeFirestore = onSnapshot(
     booksCollectionRef,
     (snapshot) => {
-      if (!snapshot.empty) {
-        const firestoreBooks: SavedBook[] = [];
-        snapshot.forEach((docSnap) => {
-          firestoreBooks.push(docSnap.data() as SavedBook);
-        });
-        firestoreBooks.sort((a, b) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
+      const firestoreBooks: SavedBook[] = [];
+      snapshot.forEach((docSnap) => {
+        firestoreBooks.push(docSnap.data() as SavedBook);
+      });
+      firestoreBooks.sort((a, b) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
+
+      if (firestoreBooks.length > 0) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(firestoreBooks));
         window.dispatchEvent(new Event('marca_pagina_books_updated'));
       } else {
-        const localBooks = getSavedBooks();
-        if (localBooks.length > 0) {
+        const rawLocal = localStorage.getItem(STORAGE_KEY);
+        const hasMigrated = localStorage.getItem('marca_pagina_migrated_to_firestore');
+        if (!hasMigrated && rawLocal && rawLocal !== '[]') {
+          localStorage.setItem('marca_pagina_migrated_to_firestore', 'true');
+          const localBooks = getSavedBooks();
           localBooks.forEach((b) => {
             syncBookToFirestore(b, userId);
           });
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+          window.dispatchEvent(new Event('marca_pagina_books_updated'));
         }
       }
     },

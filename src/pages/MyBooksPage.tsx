@@ -49,6 +49,9 @@ export const MyBooksPage: React.FC<{ onNavigateToSearch: () => void; onNavigateT
 
   const handleRemove = (id: string) => {
     removeBook(id);
+    if (selectedBook && selectedBook.id === id) {
+      setSelectedBook(null);
+    }
     loadBooks();
   };
 
@@ -390,6 +393,7 @@ export const MyBooksPage: React.FC<{ onNavigateToSearch: () => void; onNavigateT
           onStatusChange={handleStatusChange}
           onSaveReview={handleSaveReview}
           onToggleFavorite={handleToggleFavorite}
+          onRemove={handleRemove}
         />
       )}
     </div>

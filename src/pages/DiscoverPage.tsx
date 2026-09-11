@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { GoogleBookItem, SavedBook, ReadingStatus, CategoryStat } from '../types/book';
 import { analyzeReadingPatterns, discoverBooksByPattern } from '../services/recommendationService';
-import { getSavedBooks, addOrUpdateFromGoogleBook, updateBookStatus, toggleFavorite, updateBookReview } from '../services/storageService';
+import { getSavedBooks, addOrUpdateFromGoogleBook, updateBookStatus, toggleFavorite, updateBookReview, removeBook } from '../services/storageService';
 import { PatternsInsightCard } from '../components/PatternsInsightCard';
 import { BookCard } from '../components/BookCard';
 import { BookDetailModal } from '../components/BookDetailModal';
@@ -86,6 +86,17 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
   const handleToggleFavorite = (id: string) => {
     toggleFavorite(id);
     setSavedBooks(getSavedBooks());
+  };
+
+  const handleRemove = (id: string) => {
+    removeBook(id);
+    setSavedBooks(getSavedBooks());
+    if (selectedBook && selectedBook.id === id) {
+      setSelectedBook(null);
+    }
+    const current = analyzeReadingPatterns();
+    setTotalRead(current.totalRead);
+    setTopCategories(current.categories);
   };
 
   const handleSaveReview = (id: string, rating?: number, notes?: string) => {
@@ -193,6 +204,7 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
                   savedData={savedData}
                   onStatusChange={handleStatusChange}
                   onToggleFavorite={handleToggleFavorite}
+                  onRemove={handleRemove}
                   onOpenDetails={(b) => setSelectedBook(b)}
                 />
               );
@@ -209,6 +221,7 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
           onStatusChange={handleStatusChange}
           onSaveReview={handleSaveReview}
           onToggleFavorite={handleToggleFavorite}
+          onRemove={handleRemove}
         />
       )}
     </div>
