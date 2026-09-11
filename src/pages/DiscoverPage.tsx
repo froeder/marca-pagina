@@ -23,13 +23,13 @@ export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const loadRecommendations = useCallback((categoryOverride?: string) => {
-    setLoading(true);
-    setErrorMsg(null);
-    const targetCat = categoryOverride !== undefined ? categoryOverride : (activeCategory || undefined);
     if (categoryOverride !== undefined) {
       setActiveCategory(categoryOverride);
+      return;
     }
-    discoverBooksByPattern(targetCat)
+    setLoading(true);
+    setErrorMsg(null);
+    discoverBooksByPattern(activeCategory || undefined)
       .then((result) => {
         setRecommendedBooks(result.recommendedBooks);
       })
