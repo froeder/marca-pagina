@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navbar, type NavTab } from './components/Navbar';
+import { BottomTabBar } from './components/BottomTabBar';
 import { DiscoverPage } from './pages/DiscoverPage';
 import { SearchPage } from './pages/SearchPage';
 import { MyBooksPage } from './pages/MyBooksPage';
@@ -23,8 +24,8 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8F5EE] text-[#2D241E] flex flex-col selection:bg-[#422F1D] selection:text-[#FAF6F0] font-sans antialiased">
-      <Navbar currentTab={activeTab} onSelectTab={setActiveTab} readCount={readCount} />
+    <div className="min-h-screen bg-[#F8F5EE] text-[#2D241E] flex flex-col selection:bg-[#422F1D] selection:text-[#FAF6F0] font-sans antialiased pb-16 sm:pb-[68px]">
+      <Navbar onSelectTab={setActiveTab} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {activeTab === 'discover' && (
@@ -72,6 +73,8 @@ function AppContent() {
         </div>
       </footer>
 
+      <BottomTabBar currentTab={activeTab} onSelectTab={setActiveTab} readCount={readCount} />
+
       <AuthModal key={authModalOpen ? 'open' : 'closed'} />
     </div>
   );
@@ -86,6 +89,3 @@ export function App() {
 }
 
 export default App;
-
-
-

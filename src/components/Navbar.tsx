@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import { Bookmark, Sparkles, Search, BookOpen, BarChart3, Settings, Menu, X, LogIn, LogOut, ChevronDown, Loader2 } from 'lucide-react';
+import { Bookmark, ChevronDown, Loader2, LogIn, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 
 export type NavTab = 'discover' | 'search' | 'my-books' | 'stats' | 'settings';
 
 interface NavbarProps {
-  currentTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
-  readCount: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCount }) => {
-  const [mobileOpen, setMobileOpen] = useState(false);
+export const Navbar: React.FC<NavbarProps> = ({ onSelectTab }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { user, loading: authLoading, logout, openAuthModal } = useAuth();
@@ -23,22 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
     } finally {
       setIsLoggingOut(false);
       setUserMenuOpen(false);
-      setMobileOpen(false);
     }
-  };
-
-  const navItems: Array<{ id: NavTab; label: string; icon: React.ReactNode }> = [
-    { id: 'discover', label: 'Descoberta', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'search', label: 'Buscar', icon: <Search className="w-4 h-4" /> },
-    { id: 'my-books', label: 'Minha Estante', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'stats', label: 'Estatísticas', icon: <BarChart3 className="w-4 h-4" /> },
-    { id: 'settings', label: 'Configurações', icon: <Settings className="w-4 h-4" /> },
-  ];
-
-  const handleSelect = (tab: NavTab) => {
-    onSelectTab(tab);
-    setMobileOpen(false);
-    setUserMenuOpen(false);
   };
 
   const getInitials = (name?: string | null, email?: string | null) => {
@@ -50,10 +32,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#E6DCCF] transition-all">
+    <header className="sticky top-0 z-40 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#E6DCCF]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          <div onClick={() => handleSelect('discover')} className="flex items-center space-x-2.5 cursor-pointer group select-none">
+          <div
+            onClick={() => onSelectTab('discover')}
+            className="flex items-center space-x-2.5 cursor-pointer group select-none"
+          >
             <div className="w-8 h-8 rounded-lg bg-[#422F1D] text-[#FAF6F0] flex items-center justify-center transition-transform group-hover:scale-105 shadow-xs">
               <Bookmark className="w-4 h-4" />
             </div>
@@ -66,31 +51,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
               </span>
             </div>
           </div>
-
-          <nav className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => {
-              const active = currentTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleSelect(item.id)}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                    active
-                      ? 'bg-[#422F1D] text-[#FAF6F0] font-medium shadow-xs'
-                      : 'text-[#6A5A50] hover:text-[#2D241E] hover:bg-[#F2ECE4]'
-                  }`}
-                >
-                  <span className={active ? 'text-[#D3BC9E]' : 'text-[#8C7D73]'}>{item.icon}</span>
-                  <span>{item.label}</span>
-                  {item.id === 'my-books' && readCount > 0 && (
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ml-1 ${active ? 'bg-[#5F442A] text-[#FAF6F0]' : 'bg-[#EAE3D8] text-[#5F442A]'}`}>
-                      {readCount}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
 
           <div className="flex items-center space-x-2">
             {authLoading ? (
@@ -115,13 +75,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-xl shadow-lg border border-[#E6DCCF] py-1 z-50 text-xs animate-in fade-in zoom-in-95 duration-150">
+                  <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-xl shadow-lg border border-[#E6DCCF] py-1 z-50 text-xs">
                     <div className="px-3 py-2 border-b border-[#F2ECE4]">
                       <p className="font-semibold text-[#2D241E] truncate">{user.displayName || 'Leitor'}</p>
                       <p className="text-[10px] text-[#7D6E65] truncate">{user.email}</p>
                     </div>
                     <button
-                      onClick={() => { handleSelect('settings'); setUserMenuOpen(false); }}
+                      onClick={() => { onSelectTab('settings'); setUserMenuOpen(false); }}
                       className="w-full px-3 py-2 text-left text-[#422F1D] hover:bg-[#F8F5EE] flex items-center gap-2 cursor-pointer"
                     >
                       <Settings className="w-3.5 h-3.5 text-[#8C7D73]" />
@@ -151,71 +111,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
                 <span>Entrar</span>
               </button>
             )}
-
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-1.5 rounded-lg text-[#6A5A50] hover:bg-[#F2ECE4] cursor-pointer"
-              aria-label="Menu"
-            >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
         </div>
       </div>
-
-      {mobileOpen && (
-        <div className="md:hidden border-t border-[#E6DCCF] bg-white px-4 pt-2 pb-4 space-y-1 shadow-md">
-          {user ? (
-            <div className="px-3 py-2 mb-2 bg-[#FAF7F2] rounded-lg border border-[#E6DCCF] flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-[#422F1D] text-[#FAF6F0] flex items-center justify-center font-bold text-xs">
-                  {getInitials(user.displayName, user.email)}
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#2D241E]">{user.displayName || 'Leitor'}</p>
-                  <p className="text-[10px] text-[#7D6E65]">{user.email}</p>
-                </div>
-              </div>
-              <button
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                className="text-xs font-medium text-rose-600 hover:text-rose-700 cursor-pointer flex items-center gap-1 disabled:opacity-60"
-              >
-                {isLoggingOut && <Loader2 className="w-3 h-3 animate-spin text-rose-600" />}
-                <span>{isLoggingOut ? 'Saindo...' : 'Sair'}</span>
-              </button>
-            </div>
-          ) : (
-            <div className="pb-2 mb-2 border-b border-[#F2ECE4] flex gap-2">
-              <button
-                onClick={() => { openAuthModal('login'); setMobileOpen(false); }}
-                className="flex-1 py-2 text-center text-xs font-medium text-[#422F1D] bg-[#F4ECE1] hover:bg-[#E6D7C3] rounded-lg cursor-pointer"
-              >
-                Entrar
-              </button>
-              <button
-                onClick={() => { openAuthModal('register'); setMobileOpen(false); }}
-                className="flex-1 py-2 text-center text-xs font-medium text-[#FAF6F0] bg-[#422F1D] hover:bg-[#2C1F13] rounded-lg cursor-pointer"
-              >
-                Criar Conta
-              </button>
-            </div>
-          )}
-
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleSelect(item.id)}
-              className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer ${
-                currentTab === item.id ? 'bg-[#422F1D] text-[#FAF6F0]' : 'text-[#5F442A] hover:bg-[#FAF7F2]'
-              }`}
-            >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
     </header>
   );
 };
