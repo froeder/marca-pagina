@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Bookmark, Sparkles, Search, BookOpen, BarChart3, Settings, Menu, X, CheckCircle2 } from 'lucide-react';
+import { Bookmark, Sparkles, Search, BookOpen, BarChart3, Settings, Menu, X, CheckCircle2, LogIn, LogOut, ChevronDown } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export type NavTab = 'discover' | 'search' | 'my-books' | 'stats' | 'settings';
 
@@ -11,9 +12,11 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCount }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { user, logout, openAuthModal } = useAuth();
 
   const navItems: Array<{ id: NavTab; label: string; icon: React.ReactNode }> = [
-    { id: 'discover', label: 'Descoberta por Padrões', icon: <Sparkles className="w-4 h-4 text-brand-500" /> },
+    { id: 'discover', label: 'Descoberta', icon: <Sparkles className="w-4 h-4 text-brand-500" /> },
     { id: 'search', label: 'Buscar Livros', icon: <Search className="w-4 h-4" /> },
     { id: 'my-books', label: 'Minha Estante', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'stats', label: 'Estatísticas', icon: <BarChart3 className="w-4 h-4" /> },
@@ -23,6 +26,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
   const handleSelect = (tab: NavTab) => {
     onSelectTab(tab);
     setMobileOpen(false);
+    setUserMenuOpen(false);
+  };
+
+  const getInitials = (name?: string | null, email?: string | null) => {
+    if (name && name.trim()) {
+      return name.trim().split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    }
+    if (email) return email.slice(0, 2).toUpperCase();
+    return 'U';
   };
 
   return (
@@ -64,14 +76,71 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
           <div className="flex items-center space-x-3">
             <button
               onClick={() => handleSelect('my-books')}
-              className="hidden sm:flex items-center space-x-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full text-xs font-semibold text-amber-900 hover:bg-amber-100 transition-colors"
+              className="hidden sm:flex items-center space-x-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full text-xs font-semibold text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer"
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span><strong>{readCount}</strong> {readCount === 1 ? 'lido' : 'lidos'}</span>
             </button>
+
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 p-1 rounded-full hover:bg-stone-100 border border-amber-200 transition-colors cursor-pointer"
+                  aria-label="Menu do Usuário"
+                >
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full object-cover border border-amber-300" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs">
+                      {getInitials(user.displayName, user.email)}
+                    </div>
+                  )}
+                  <span className="hidden lg:block text-xs font-semibold text-stone-700 max-w-[90px] truncate">
+                    {user.displayName || user.email?.split('@')[0]}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-stone-500 hidden sm:block" />
+                </button>
+
+                {userMenuOpen && (
+                  <div
+                    className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-stone-200 py-2 z-50"
+                    onMouseLeave={() => setUserMenuOpen(false)}
+                  >
+                    <div className="px-4 py-2 border-b border-stone-100">
+                      <p className="text-xs font-bold text-stone-900 truncate">{user.displayName || 'Leitor'}</p>
+                      <p className="text-[11px] text-stone-500 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => handleSelect('settings')}
+                      className="w-full px-4 py-2 text-left text-xs font-medium text-stone-700 hover:bg-stone-50 flex items-center gap-2 cursor-pointer"
+                    >
+                      <Settings className="w-4 h-4 text-stone-400" />
+                      <span>Configurações</span>
+                    </button>
+                    <button
+                      onClick={() => { logout(); setUserMenuOpen(false); }}
+                      className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4 text-rose-500" />
+                      <span>Sair da Conta</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => openAuthModal('login')}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Entrar</span>
+              </button>
+            )}
+
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100"
+              className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100 cursor-pointer"
               aria-label="Menu"
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -82,11 +151,46 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
 
       {mobileOpen && (
         <div className="md:hidden border-t border-amber-200 bg-white px-4 pt-2 pb-4 space-y-1 shadow-lg">
+          {user ? (
+            <div className="px-3.5 py-2.5 mb-2 bg-amber-50/80 rounded-xl border border-amber-200/60 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs">
+                  {getInitials(user.displayName, user.email)}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-stone-900">{user.displayName || 'Leitor'}</p>
+                  <p className="text-[10px] text-stone-500">{user.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { logout(); setMobileOpen(false); }}
+                className="text-xs font-bold text-rose-600 hover:text-rose-700 p-1 cursor-pointer"
+              >
+                Sair
+              </button>
+            </div>
+          ) : (
+            <div className="pb-2 border-b border-stone-100 flex gap-2">
+              <button
+                onClick={() => { openAuthModal('login'); setMobileOpen(false); }}
+                className="flex-1 py-2 text-center text-xs font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl cursor-pointer"
+              >
+                Entrar
+              </button>
+              <button
+                onClick={() => { openAuthModal('register'); setMobileOpen(false); }}
+                className="flex-1 py-2 text-center text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl cursor-pointer"
+              >
+                Criar Conta
+              </button>
+            </div>
+          )}
+
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => handleSelect(item.id)}
-              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-base font-medium ${
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-base font-medium cursor-pointer ${
                 currentTab === item.id ? 'bg-amber-100 text-brand-900 font-semibold' : 'text-stone-700 hover:bg-stone-50'
               }`}
             >

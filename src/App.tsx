@@ -5,10 +5,12 @@ import { SearchPage } from './pages/SearchPage';
 import { MyBooksPage } from './pages/MyBooksPage';
 import { StatsPage } from './pages/StatsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { AuthModal } from './components/AuthModal';
+import { AuthProvider } from './context/AuthContext';
 import { getReadBooks } from './services/storageService';
 import { Bookmark, Sparkles } from 'lucide-react';
 
-export function App() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState<NavTab>('discover');
   const [readCount, setReadCount] = useState(getReadBooks().length);
 
@@ -49,7 +51,7 @@ export function App() {
       <footer className="mt-auto border-t border-amber-200/60 bg-white/70 backdrop-blur-xs py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
           <div className="flex items-center space-x-2 font-serif font-bold text-stone-800">
-            <div className="w-6 h-6 rounded-lg bg-brand-500 flex items-center justify-center text-white">
+            <div className="w-6 h-6 rounded-lg bg-amber-600 flex items-center justify-center text-white">
               <Bookmark className="w-3.5 h-3.5" />
             </div>
             <span>Marca-Página</span>
@@ -58,7 +60,7 @@ export function App() {
           <div className="flex items-center gap-1 text-center">
             <span>Descoberta inteligente de livros alimentada por</span>
             <span className="font-semibold text-stone-700 inline-flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-brand-500" /> Google Books API
+              <Sparkles className="w-3 h-3 text-amber-600" /> Google Books API
             </span>
           </div>
 
@@ -67,9 +69,20 @@ export function App() {
           </div>
         </div>
       </footer>
+
+      <AuthModal />
     </div>
   );
 }
 
+export function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
 export default App;
+
 
