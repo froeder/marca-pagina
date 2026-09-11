@@ -55,94 +55,94 @@ export const SettingsPage: React.FC = () => {
     }
   };
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-300">
       <div>
-        <h1 className="font-serif font-bold text-3xl text-stone-900">Configurações</h1>
-        <p className="text-xs sm:text-sm text-stone-500 mt-1">
+        <h1 className="font-sans font-bold text-2xl sm:text-3xl text-zinc-900 tracking-tight">Configurações</h1>
+        <p className="text-xs sm:text-sm text-zinc-500 mt-1">
           Gerenciamento de Conta Firebase, Google Books API e dados locais
         </p>
       </div>
 
       {/* FIREBASE & ACCOUNT CARD */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-amber-200/70 shadow-xs space-y-5">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-zinc-200 shadow-2xs space-y-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-amber-100 text-amber-800 rounded-xl">
+            <div className="p-2 bg-amber-50 text-amber-700 rounded-xl border border-amber-100">
               <Flame className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-serif font-bold text-lg text-stone-900">Conta & Firebase</h2>
-              <p className="text-xs text-stone-500">Autenticação e sincronização de usuários</p>
+              <h2 className="font-sans font-bold text-sm sm:text-base text-zinc-900">Conta & Firebase</h2>
+              <p className="text-xs text-zinc-500">Autenticação e sincronização de usuários</p>
             </div>
           </div>
           {isConfigured ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-full">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-full">
               <CheckCircle2 className="w-3.5 h-3.5" /> Conectado
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-semibold rounded-full">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-semibold rounded-full">
               <AlertCircle className="w-3.5 h-3.5" /> .env Pendente
             </span>
           )}
         </div>
 
         {user ? (
-          <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               {user.photoURL ? (
-                <img src={user.photoURL} alt="" className="w-12 h-12 rounded-full border border-amber-300" />
+                <img src={user.photoURL} alt="" className="w-11 h-11 rounded-full border border-zinc-300" />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-base">
-                  <User className="w-6 h-6" />
+                <div className="w-11 h-11 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-sm">
+                  <User className="w-5 h-5" />
                 </div>
               )}
               <div>
-                <p className="font-bold text-sm text-stone-900">{user.displayName || 'Leitor'}</p>
-                <p className="text-xs text-stone-600">{user.email}</p>
-                <p className="text-[10px] text-stone-400 mt-0.5">UID: {user.uid.slice(0, 12)}...</p>
+                <p className="font-bold text-sm text-zinc-900">{user.displayName || 'Leitor'}</p>
+                <p className="text-xs text-zinc-600">{user.email}</p>
+                <p className="text-[10px] text-zinc-400 mt-0.5">UID: {user.uid.slice(0, 12)}...</p>
               </div>
             </div>
             <button
               onClick={() => logout()}
-              className="px-4 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200/60 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sair da Conta</span>
             </button>
           </div>
         ) : isConfigured ? (
-          <div className="bg-amber-50/60 rounded-2xl p-4 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-bold text-stone-900">Nenhum usuário conectado</p>
-              <p className="text-[11px] text-stone-600">Faça login ou crie uma conta para salvar suas preferências.</p>
+              <p className="text-xs font-bold text-zinc-900">Nenhum usuário conectado</p>
+              <p className="text-[11px] text-zinc-500">Faça login ou crie uma conta para sincronizar suas leituras.</p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => openAuthModal('login')}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-medium transition-colors cursor-pointer"
               >
                 Entrar
               </button>
               <button
                 onClick={() => openAuthModal('register')}
-                className="px-4 py-2 bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-800 rounded-lg text-xs font-medium transition-colors cursor-pointer"
               >
                 Criar Conta
               </button>
             </div>
           </div>
         ) : (
-          <div className="space-y-3 bg-amber-50/50 rounded-2xl p-4 border border-amber-200 text-xs text-stone-700">
-            <p className="font-semibold text-stone-900 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-600" />
+          <div className="space-y-3 bg-zinc-50 rounded-xl p-4 border border-zinc-200 text-xs text-zinc-700">
+            <p className="font-semibold text-zinc-900 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-zinc-500" />
               Como configurar as credenciais do Firebase:
             </p>
-            <ol className="list-decimal list-inside space-y-1 text-[11px] text-stone-600">
-              <li>Crie um projeto no <a href="https://console.firebase.google.com" target="_blank" rel="noreferrer" className="text-amber-700 underline font-medium">console.firebase.google.com</a>.</li>
+            <ol className="list-decimal list-inside space-y-1 text-[11px] text-zinc-600">
+              <li>Crie um projeto no <a href="https://console.firebase.google.com" target="_blank" rel="noreferrer" className="text-zinc-900 underline font-medium">console.firebase.google.com</a>.</li>
               <li>Ative o <strong>Authentication</strong> (provedores E-mail/Senha e Google).</li>
-              <li>Preencha as variáveis de ambiente no arquivo <code className="bg-white px-1 py-0.5 rounded font-mono text-amber-900 border border-amber-200">.env</code>.</li>
+              <li>Preencha as variáveis de ambiente no arquivo <code className="bg-white px-1 py-0.5 rounded font-mono text-zinc-900 border border-zinc-200">.env</code>.</li>
             </ol>
-            <div className="mt-2 text-[10px] font-mono bg-white p-2.5 rounded-xl border border-amber-200 text-stone-600 overflow-x-auto">
+            <div className="mt-2 text-[10px] font-mono bg-white p-2.5 rounded-lg border border-zinc-200 text-zinc-600 overflow-x-auto">
               VITE_FIREBASE_API_KEY=sua_api_key<br />
               VITE_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com<br />
               VITE_FIREBASE_PROJECT_ID=seu-projeto-id
@@ -151,22 +151,22 @@ export const SettingsPage: React.FC = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-amber-200/70 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-zinc-200 shadow-2xs space-y-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-brand-50 text-brand-700 rounded-xl">
+          <div className="p-2 bg-zinc-100 text-zinc-700 rounded-xl border border-zinc-200">
             <Key className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-serif font-bold text-lg text-stone-900">Chave da Google Books API</h2>
-            <p className="text-xs text-stone-500">
+            <h2 className="font-sans font-bold text-sm sm:text-base text-zinc-900">Chave da Google Books API</h2>
+            <p className="text-xs text-zinc-500">
               Opcional para consultas moderadas. Uma chave própria remove limites de requisição por minuto.
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSaveApiKey} className="space-y-3 pt-2">
+        <form onSubmit={handleSaveApiKey} className="space-y-3 pt-1">
           <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1">
+            <label className="block text-xs font-semibold text-zinc-700 mb-1">
               Google Books API Key
             </label>
             <div className="flex gap-2">
@@ -175,13 +175,13 @@ export const SettingsPage: React.FC = () => {
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
                 placeholder="AIzaSy..."
-                className="flex-1 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:border-brand-500 bg-stone-50 font-mono"
+                className="flex-1 text-xs sm:text-sm px-3.5 py-2 rounded-lg border border-zinc-200 focus:outline-none focus:border-zinc-900 bg-zinc-50 font-mono"
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
               >
-                {savedSuccess ? <Check className="w-4 h-4 text-emerald-300" /> : null}
+                {savedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : null}
                 <span>{savedSuccess ? 'Salvo!' : 'Salvar Chave'}</span>
               </button>
             </div>
@@ -189,38 +189,38 @@ export const SettingsPage: React.FC = () => {
         </form>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-amber-200/70 shadow-xs space-y-6">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-zinc-200 shadow-2xs space-y-5">
         <div>
-          <h2 className="font-serif font-bold text-lg text-stone-900">Backup & Sincronização Local</h2>
-          <p className="text-xs text-stone-500 mt-1">
+          <h2 className="font-sans font-bold text-sm sm:text-base text-zinc-900">Backup & Sincronização Local</h2>
+          <p className="text-xs text-zinc-500 mt-0.5">
             Seus dados ficam 100% salvos no seu navegador (LocalStorage). Exporte um backup JSON quando quiser.
           </p>
         </div>
 
         {importStatus && (
-          <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs font-medium">
+          <div className="p-3 bg-zinc-100 border border-zinc-200 text-zinc-800 rounded-lg text-xs font-medium">
             {importStatus}
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <button
             onClick={handleExport}
-            className="flex items-center justify-between p-4 rounded-2xl border border-stone-200 hover:border-brand-300 hover:bg-amber-50/50 transition-all text-left"
+            className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-all text-left cursor-pointer"
           >
             <div className="space-y-0.5">
-              <div className="text-xs font-bold text-stone-900">Exportar Backup JSON</div>
-              <div className="text-[11px] text-stone-500">Baixar acervo e avaliações</div>
+              <div className="text-xs font-semibold text-zinc-900">Exportar Backup JSON</div>
+              <div className="text-[11px] text-zinc-500">Baixar acervo e avaliações</div>
             </div>
-            <Download className="w-5 h-5 text-brand-600 shrink-0 ml-2" />
+            <Download className="w-4 h-4 text-zinc-600 shrink-0 ml-2" />
           </button>
 
-          <label className="flex items-center justify-between p-4 rounded-2xl border border-stone-200 hover:border-brand-300 hover:bg-amber-50/50 transition-all cursor-pointer text-left">
+          <label className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-all cursor-pointer text-left">
             <div className="space-y-0.5">
-              <div className="text-xs font-bold text-stone-900">Restaurar do Arquivo</div>
-              <div className="text-[11px] text-stone-500">Importar arquivo JSON</div>
+              <div className="text-xs font-semibold text-zinc-900">Restaurar do Arquivo</div>
+              <div className="text-[11px] text-zinc-500">Importar arquivo JSON</div>
             </div>
-            <Upload className="w-5 h-5 text-brand-600 shrink-0 ml-2" />
+            <Upload className="w-4 h-4 text-zinc-600 shrink-0 ml-2" />
             <input
               type="file"
               accept="application/json"
@@ -230,19 +230,19 @@ export const SettingsPage: React.FC = () => {
           </label>
         </div>
 
-        <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+        <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-rose-800 flex items-center gap-1.5">
+            <div className="text-xs font-medium text-rose-800 flex items-center gap-1.5">
               <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
               Restaurar Demonstração
             </div>
-            <div className="text-[11px] text-stone-500">
+            <div className="text-[11px] text-zinc-500">
               Recarrega o acervo clássico da literatura brasileira para testar os padrões
             </div>
           </div>
           <button
             onClick={handleResetDemo}
-            className="px-3.5 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors flex items-center gap-1.5"
+            className="px-3 py-1.5 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200/60 transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Restaurar</span>
@@ -250,13 +250,13 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-6 rounded-3xl bg-amber-100/50 border border-amber-200/80 text-stone-700 space-y-2">
-        <div className="flex items-center gap-2 font-serif font-bold text-brand-900">
-          <Sparkles className="w-4 h-4 text-brand-600" />
+      <div className="p-5 rounded-2xl bg-zinc-100/70 border border-zinc-200 text-zinc-700 space-y-1.5">
+        <div className="flex items-center gap-2 font-sans font-semibold text-zinc-900 text-xs">
+          <Sparkles className="w-3.5 h-3.5 text-zinc-600" />
           <span>Sobre o Marca-Página</span>
         </div>
-        <p className="text-xs leading-relaxed">
-          Marca-Página é um gerenciador de leitura inteligente focado na descoberta de livros por padrões e preferências. Integrado diretamente à Google Books API com filtragem em Língua Portuguesa (<code className="bg-amber-200/60 px-1 py-0.5 rounded text-amber-950 font-mono text-[11px]">langRestrict=pt</code>).
+        <p className="text-xs leading-relaxed text-zinc-600">
+          Marca-Página é um gerenciador de leitura inteligente focado na descoberta de livros por padrões e preferências. Integrado diretamente à Google Books API com filtragem em Língua Portuguesa (<code className="bg-zinc-200/70 px-1 py-0.5 rounded text-zinc-900 font-mono text-[11px]">langRestrict=pt</code>).
         </p>
       </div>
     </div>

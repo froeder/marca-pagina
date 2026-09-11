@@ -97,36 +97,42 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-amber-200/80 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-zinc-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         {/* TOP BANNER */}
-        <div className="bg-gradient-to-r from-brand-600 to-brand-700 px-6 py-5 text-white flex items-center justify-between">
+        <div className="bg-zinc-900 px-6 py-5 text-white flex items-center justify-between border-b border-zinc-800">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center font-bold">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center font-bold">
+              <Sparkles className="w-4 h-4 text-zinc-200" />
             </div>
             <div>
-              <h2 className="font-serif font-bold text-lg leading-tight">
+              <h2 className="font-sans font-bold text-base leading-tight">
                 {authModalMode === 'login' && 'Entrar na Conta'}
                 {authModalMode === 'register' && 'Criar Nova Conta'}
                 {authModalMode === 'forgot-password' && 'Recuperar Senha'}
               </h2>
-              <p className="text-xs text-amber-100 font-medium">Marca-Página Literário</p>
+              <p className="text-xs text-zinc-400 font-medium">Marca-Página Literário</p>
             </div>
           </div>
-          <button onClick={closeAuthModal} className="p-1.5 rounded-full hover:bg-white/20 text-white transition-colors" aria-label="Fechar">
-            <X className="w-5 h-5" />
+          <button
+            onClick={closeAuthModal}
+            className="p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            aria-label="Fechar"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* TAB CONTROLS */}
         {authModalMode !== 'forgot-password' && (
-          <div className="flex border-b border-stone-200 bg-stone-50/70 p-1">
+          <div className="flex border-b border-zinc-200 bg-zinc-50 p-1">
             <button
               type="button"
               onClick={() => { setAuthModalMode('login'); setError(null); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
-                authModalMode === 'login' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                authModalMode === 'login'
+                  ? 'bg-white text-zinc-900 shadow-xs border border-zinc-200/80'
+                  : 'text-zinc-500 hover:text-zinc-900'
               }`}
             >
               Entrar
@@ -134,8 +140,10 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={() => { setAuthModalMode('register'); setError(null); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
-                authModalMode === 'register' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-800'
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                authModalMode === 'register'
+                  ? 'bg-white text-zinc-900 shadow-xs border border-zinc-200/80'
+                  : 'text-zinc-500 hover:text-zinc-900'
               }`}
             >
               Criar Conta
@@ -145,13 +153,13 @@ export const AuthModal: React.FC = () => {
 
         <div className="p-6 space-y-4">
           {!isConfigured && (
-            <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-2xl text-xs text-amber-900 space-y-1">
+            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
               <div className="flex items-center gap-1.5 font-bold">
                 <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>Credenciais do Firebase pendentes</span>
               </div>
-              <p className="text-[11px] text-stone-600">
-                Preencha as variáveis em <code className="bg-amber-200/50 px-1 py-0.5 rounded font-mono text-amber-950">.env</code> para habilitar o login em nuvem.
+              <p className="text-[11px] text-zinc-600">
+                Preencha as variáveis em <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-900">.env</code> para habilitar o login em nuvem.
               </p>
             </div>
           )}
@@ -176,7 +184,7 @@ export const AuthModal: React.FC = () => {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white hover:bg-stone-50 text-stone-700 font-semibold text-xs sm:text-sm rounded-xl border border-stone-300 shadow-xs transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2.5 px-4 py-2 bg-white hover:bg-zinc-50 text-zinc-800 font-medium text-xs sm:text-sm rounded-xl border border-zinc-200 shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -187,8 +195,8 @@ export const AuthModal: React.FC = () => {
                 <span>Continuar com Google</span>
               </button>
               <div className="relative flex items-center justify-center">
-                <div className="border-t border-stone-200 w-full" />
-                <span className="bg-white px-3 text-[11px] uppercase tracking-wider text-stone-400 font-semibold">ou com e-mail</span>
+                <div className="border-t border-zinc-200 w-full" />
+                <span className="bg-white px-3 text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">ou com e-mail</span>
               </div>
             </>
           )}
@@ -196,32 +204,32 @@ export const AuthModal: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-3">
             {authModalMode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">Nome Completo</label>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">Nome Completo</label>
                 <div className="relative">
-                  <UserIcon className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <UserIcon className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Seu nome completo"
-                    className="w-full text-xs sm:text-sm pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full text-xs sm:text-sm pl-9 pr-3.5 py-2 rounded-xl border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">E-mail</label>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">E-mail</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu.email@exemplo.com"
-                  className="w-full text-xs sm:text-sm pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full text-xs sm:text-sm pl-9 pr-3.5 py-2 rounded-xl border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900"
                 />
               </div>
             </div>
@@ -229,31 +237,31 @@ export const AuthModal: React.FC = () => {
             {authModalMode !== 'forgot-password' && (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold text-stone-700">Senha</label>
+                  <label className="block text-xs font-semibold text-zinc-700">Senha</label>
                   {authModalMode === 'login' && (
                     <button
                       type="button"
                       onClick={() => setAuthModalMode('forgot-password')}
-                      className="text-[11px] text-amber-700 hover:text-amber-800 font-medium"
+                      className="text-[11px] text-zinc-600 hover:text-zinc-950 font-medium cursor-pointer"
                     >
                       Esqueceu a senha?
                     </button>
                   )}
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full text-xs sm:text-sm pl-9 pr-10 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full text-xs sm:text-sm pl-9 pr-10 py-2 rounded-xl border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -263,16 +271,16 @@ export const AuthModal: React.FC = () => {
 
             {authModalMode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">Confirmar Senha</label>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">Confirmar Senha</label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full text-xs sm:text-sm pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full text-xs sm:text-sm pl-9 pr-3.5 py-2 rounded-xl border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900"
                   />
                 </div>
               </div>
@@ -281,7 +289,7 @@ export const AuthModal: React.FC = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full mt-2 py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-amber-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="w-full mt-2 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>
@@ -296,7 +304,7 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={() => { setAuthModalMode('login'); setError(null); setSuccessMessage(null); }}
-              className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-stone-600 hover:text-stone-900 py-1 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 py-1 cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Voltar para o Login</span>

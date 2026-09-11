@@ -22,17 +22,17 @@ export const PatternsInsightCard: React.FC<PatternsInsightCardProps> = ({
 }) => {
   if (totalRead === 0) {
     return (
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-6 shadow-sm">
-        <div className="flex items-start space-x-4">
-          <div className="p-3 bg-brand-500/10 rounded-xl text-brand-600">
-            <Sparkles className="w-6 h-6" />
+      <div className="bg-white border border-dashed border-zinc-300 rounded-2xl p-5 sm:p-6 shadow-2xs">
+        <div className="flex items-start space-x-3.5">
+          <div className="p-2.5 bg-zinc-100 rounded-xl text-zinc-800 shrink-0">
+            <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-serif font-bold text-lg text-stone-900">
-              Descoberta por Padrões aguardando histórico
+            <h3 className="font-sans font-semibold text-sm sm:text-base text-zinc-900">
+              Descoberta por Padrões Literários
             </h3>
-            <p className="text-sm text-stone-600 mt-1">
-              Marque livros que você já leu como <strong>"Lido"</strong>. O algoritmo identificará seus gêneros e tópicos favoritos para gerar recomendações personalizadas em Português via Google Books API.
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1 leading-relaxed">
+              Marque livros que você já leu como <strong>"Lido"</strong> na sua estante. O sistema analisará seus hábitos de leitura para sugerir novas obras em Português pela Google Books API.
             </p>
           </div>
         </div>
@@ -43,71 +43,66 @@ export const PatternsInsightCard: React.FC<PatternsInsightCardProps> = ({
   const primary = topCategories[0];
 
   return (
-    <div className="bg-white rounded-2xl border border-amber-200/80 p-6 shadow-sm relative overflow-hidden">
-      {/* Decorative gradient blur */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-100/40 to-amber-100/30 rounded-full blur-3xl -z-0 pointer-events-none" />
-
-      <div className="relative z-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center text-brand-600">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
-                  Padrão Identificado
-                </span>
-                <span className="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">
-                  Baseado em {totalRead} {totalRead === 1 ? 'livro lido' : 'livros lidos'}
-                </span>
-              </div>
-              <h2 className="font-serif text-xl font-bold text-stone-900 mt-0.5">
-                Seu gênero principal é <span className="text-brand-600 font-extrabold">{primary?.displayName || 'Geral'}</span>
-              </h2>
-            </div>
+    <div className="bg-white rounded-2xl border border-zinc-200/80 p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.03)] relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-100">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+            <TrendingUp className="w-4 h-4" />
           </div>
-
-          <button
-            onClick={onRefreshRecommendations}
-            disabled={isLoading}
-            className="self-start md:self-auto flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-brand-50 hover:text-brand-600 text-stone-700 text-xs font-semibold transition-all disabled:opacity-50"
-            title="Recarregar recomendações da API"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Atualizar Sugestões</span>
-          </button>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                Padrão Ativo
+              </span>
+              <span className="text-[11px] bg-zinc-100 text-zinc-600 px-2 py-0.2 rounded-md font-medium">
+                {totalRead} {totalRead === 1 ? 'livro analisado' : 'livros analisados'}
+              </span>
+            </div>
+            <h2 className="font-sans text-base sm:text-lg font-semibold text-zinc-900 mt-0.5">
+              Gênero predominante: <span className="text-zinc-950 font-bold">{primary?.displayName || 'Geral'}</span>
+            </h2>
+          </div>
         </div>
 
-        {/* Category distribution bars */}
-        <div className="mt-5 space-y-3">
-          <div className="flex items-center justify-between text-xs font-medium text-stone-600">
-            <span className="flex items-center gap-1">
-              <Layers className="w-3.5 h-3.5 text-stone-400" /> Distribuição das suas preferências:
-            </span>
-            <span className="text-stone-400">Clique para filtrar por outro padrão</span>
-          </div>
+        <button
+          onClick={onRefreshRecommendations}
+          disabled={isLoading}
+          className="self-start md:self-auto flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/70 text-zinc-800 text-xs font-medium transition-all disabled:opacity-50 cursor-pointer"
+          title="Recarregar recomendações da API"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <span>Atualizar Sugestões</span>
+        </button>
+      </div>
 
-          <div className="flex flex-wrap gap-2">
-            {topCategories.map((cat) => {
-              const isSelected = (activeCategory || primary?.name) === cat.name;
-              return (
-                <div key={cat.name} className="flex items-center">
-                  <CategoryBadge
-                    category={cat.name}
-                    selected={isSelected}
-                    onClick={() => onSelectCategory(cat.name)}
-                    className="text-xs font-medium py-1 px-3 shadow-xs"
-                  />
-                  <span className="ml-1 text-[11px] font-semibold text-stone-500">
-                    {cat.count}x ({cat.percentage}%)
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+      {/* Category distribution pills */}
+      <div className="mt-4 space-y-2.5">
+        <div className="flex items-center justify-between text-xs font-medium text-zinc-500">
+          <span className="flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-zinc-400" /> Distribuição de preferências:
+          </span>
+          <span className="text-[11px] text-zinc-400 hidden sm:inline">Clique para alternar o filtro ativo</span>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {topCategories.map((cat) => {
+            const isSelected = (activeCategory || primary?.name) === cat.name;
+            return (
+              <div key={cat.name} className="flex items-center">
+                <CategoryBadge
+                  category={cat.name}
+                  selected={isSelected}
+                  onClick={() => onSelectCategory(cat.name)}
+                />
+                <span className="ml-1 text-[11px] font-medium text-zinc-400">
+                  {cat.count}x ({cat.percentage}%)
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
   );
 };
+

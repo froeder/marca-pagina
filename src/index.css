@@ -2,19 +2,19 @@
 
 @layer theme {
   :root {
-    --color-brand-50: #fbf7f0;
-    --color-brand-100: #f4ecdc;
-    --color-brand-200: #ead9b8;
-    --color-brand-300: #dec18e;
-    --color-brand-400: #d1a565;
-    --color-brand-500: #b8860b;
-    --color-brand-600: #9c6c06;
-    --color-brand-700: #7d5007;
-    --color-brand-800: #67400d;
-    --color-brand-900: #563510;
-    --color-brand-950: #321c05;
-    --font-serif: "Lora", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --color-brand-50: #f8fafc;
+    --color-brand-100: #f1f5f9;
+    --color-brand-200: #e2e8f0;
+    --color-brand-300: #cbd5e1;
+    --color-brand-400: #94a3b8;
+    --color-brand-500: #64748b;
+    --color-brand-600: #475569;
+    --color-brand-700: #334155;
+    --color-brand-800: #1e293b;
+    --color-brand-900: #0f172a;
+    --color-brand-950: #020617;
+    --font-serif: "Newsreader", Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-sans: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
   }
 }
 
@@ -26,26 +26,27 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #faf8f5;
-  color: #1c1917;
+  background-color: #fafafa;
+  color: #18181b;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbars */
+/* Minimalist scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1ede6;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4ccbe;
+  background: #e4e4e7;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #b5a995;
+  background: #d4d4d8;
 }
+
 
 

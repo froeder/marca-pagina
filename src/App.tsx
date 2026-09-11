@@ -21,7 +21,7 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-stone-800 flex flex-col selection:bg-brand-200 selection:text-brand-900">
+    <div className="min-h-screen bg-zinc-50/70 text-zinc-900 flex flex-col selection:bg-zinc-900 selection:text-white font-sans antialiased">
       <Navbar currentTab={activeTab} onSelectTab={setActiveTab} readCount={readCount} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -48,24 +48,24 @@ function AppContent() {
         {activeTab === 'settings' && <SettingsPage />}
       </main>
 
-      <footer className="mt-auto border-t border-amber-200/60 bg-white/70 backdrop-blur-xs py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-          <div className="flex items-center space-x-2 font-serif font-bold text-stone-800">
-            <div className="w-6 h-6 rounded-lg bg-amber-600 flex items-center justify-center text-white">
-              <Bookmark className="w-3.5 h-3.5" />
+      <footer className="mt-auto border-t border-zinc-200/80 bg-white/60 backdrop-blur-sm py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+          <div className="flex items-center space-x-2 font-medium text-zinc-900">
+            <div className="w-5 h-5 rounded-md bg-zinc-900 flex items-center justify-center text-white">
+              <Bookmark className="w-3 h-3" />
             </div>
-            <span>Marca-Página</span>
+            <span className="tracking-tight font-semibold">Marca-Página</span>
           </div>
 
-          <div className="flex items-center gap-1 text-center">
+          <div className="flex items-center gap-1.5 text-center text-zinc-500">
             <span>Descoberta inteligente de livros alimentada por</span>
-            <span className="font-semibold text-stone-700 inline-flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-600" /> Google Books API
+            <span className="font-semibold text-zinc-800 inline-flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-zinc-900" /> Google Books API
             </span>
           </div>
 
-          <div className="text-[11px] text-stone-400">
-            Filtro de idioma nativo em Português
+          <div className="text-[11px] text-zinc-400">
+            Filtro de catálogo em Português
           </div>
         </div>
       </footer>
@@ -84,5 +84,6 @@ export function App() {
 }
 
 export default App;
+
 
 
