@@ -1,9 +1,107 @@
 import type { SavedBook, ReadingStatus, GoogleBookItem } from '../types/book';
 import { sanitizeImageUrl } from '../utils/imageUtils';
+import { doc, setDoc, deleteDoc, collection, onSnapshot } from 'firebase/firestore';
+import { auth, db } from './firebase';
+
 export { getApiKey, setApiKey } from './googleBooksApi';
 
 const STORAGE_KEY = 'marca_pagina_saved_books';
 const GOAL_KEY = 'marca_pagina_reading_goal';
+
+function cleanObject<T extends Record<string, any>>(obj: T): Partial<T> {
+  const cleaned: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned as Partial<T>;
+}
+
+export async function syncBookToFirestore(book: SavedBook, userId?: string): Promise<void> {
+  const uid = userId || auth?.currentUser?.uid;
+  if (!db || !uid) return;
+  try {
+    const bookRef = doc(db, 'users', uid, 'books', book.id);
+    await setDoc(bookRef, cleanObject(book), { merge: true });
+  } catch (err) {
+    console.error('Erro ao sincronizar livro com Firestore:', err);
+  }
+}
+
+export async function removeBookFromFirestore(bookId: string, userId?: string): Promise<void> {
+  const uid = userId || auth?.currentUser?.uid;
+  if (!db || !uid) return;
+  try {
+    const bookRef = doc(db, 'users', uid, 'books', bookId);
+    await deleteDoc(bookRef);
+  } catch (err) {
+    console.error('Erro ao remover livro do Firestore:', err);
+  }
+}
+
+export async function syncGoalToFirestore(goal: number, userId?: string): Promise<void> {
+  const uid = userId || auth?.currentUser?.uid;
+  if (!db || !uid) return;
+  try {
+    const userRef = doc(db, 'users', uid);
+    await setDoc(userRef, { readingGoal: goal }, { merge: true });
+  } catch (err) {
+    console.error('Erro ao salvar meta no Firestore:', err);
+  }
+}
+
+let unsubscribeFirestore: (() => void) | null = null;
+
+export function initFirestoreSync(userId: string): () => void {
+  if (unsubscribeFirestore) {
+    unsubscribeFirestore();
+    unsubscribeFirestore = null;
+  }
+
+  if (!db || !userId) return () => {};
+
+  const booksCollectionRef = collection(db, 'users', userId, 'books');
+
+  unsubscribeFirestore = onSnapshot(
+    booksCollectionRef,
+    (snapshot) => {
+      if (!snapshot.empty) {
+        const firestoreBooks: SavedBook[] = [];
+        snapshot.forEach((docSnap) => {
+          firestoreBooks.push(docSnap.data() as SavedBook);
+        });
+        firestoreBooks.sort((a, b) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(firestoreBooks));
+        window.dispatchEvent(new Event('marca_pagina_books_updated'));
+      } else {
+        const localBooks = getSavedBooks();
+        if (localBooks.length > 0) {
+          localBooks.forEach((b) => {
+            syncBookToFirestore(b, userId);
+          });
+        }
+      }
+    },
+    (error) => {
+      console.error('Erro na sincronização em tempo real do Firestore:', error);
+    }
+  );
+
+  return () => {
+    if (unsubscribeFirestore) {
+      unsubscribeFirestore();
+      unsubscribeFirestore = null;
+    }
+  };
+}
+
+export function stopFirestoreSync(): void {
+  if (unsubscribeFirestore) {
+    unsubscribeFirestore();
+    unsubscribeFirestore = null;
+  }
+}
 
 const INITIAL_DEMO_BOOKS: SavedBook[] = [
   {
@@ -93,6 +191,7 @@ export function addOrUpdateFromGoogleBook(
     books.unshift(bookData);
   }
   saveBooks(books);
+  syncBookToFirestore(bookData);
   return bookData;
 }
 
@@ -105,6 +204,7 @@ export function updateBookStatus(id: string, status: ReadingStatus): SavedBook |
     books[index].dateFinished = new Date().toISOString();
   }
   saveBooks(books);
+  syncBookToFirestore(books[index]);
   return books[index];
 }
 
@@ -115,6 +215,7 @@ export function updateBookReview(id: string, userRating?: number, userNotes?: st
   if (userRating !== undefined) books[index].userRating = userRating;
   if (userNotes !== undefined) books[index].userNotes = userNotes;
   saveBooks(books);
+  syncBookToFirestore(books[index]);
   return books[index];
 }
 
@@ -124,11 +225,13 @@ export function toggleFavorite(id: string): SavedBook | null {
   if (index === -1) return null;
   books[index].favorite = !books[index].favorite;
   saveBooks(books);
+  syncBookToFirestore(books[index]);
   return books[index];
 }
 
 export function removeBook(id: string): void {
   saveBooks(getSavedBooks().filter((b) => b.id !== id));
+  removeBookFromFirestore(id);
 }
 
 export function getReadBooks(): SavedBook[] {
@@ -142,6 +245,7 @@ export function getReadingGoal(): number {
 
 export function setReadingGoal(goal: number): void {
   localStorage.setItem(GOAL_KEY, String(goal));
+  syncGoalToFirestore(goal);
 }
 
 export function exportLibraryJson(): string {
@@ -156,6 +260,7 @@ export function importLibraryJson(jsonString: string): boolean {
       return false;
     }
     saveBooks(books);
+    books.forEach((b) => syncBookToFirestore(b));
     return true;
   } catch {
     return false;
@@ -164,4 +269,5 @@ export function importLibraryJson(jsonString: string): boolean {
 
 export function resetToDemoBooks(): void {
   saveBooks(INITIAL_DEMO_BOOKS);
+  INITIAL_DEMO_BOOKS.forEach((b) => syncBookToFirestore(b));
 }

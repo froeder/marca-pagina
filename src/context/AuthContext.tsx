@@ -10,6 +10,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { auth, googleProvider, isFirebaseConfigured, translateFirebaseError } from '../services/firebase';
+import { initFirestoreSync, stopFirestoreSync } from '../services/storageService';
 
 export type AuthModalMode = 'login' | 'register' | 'forgot-password';
 
@@ -49,6 +50,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (currentUser) => {
         setUser(currentUser);
         setLoading(false);
+        if (currentUser) {
+          initFirestoreSync(currentUser.uid);
+        } else {
+          stopFirestoreSync();
+        }
       },
       (error) => {
         console.error('Erro no listener de autenticação:', error);
@@ -56,7 +62,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      stopFirestoreSync();
+    };
   }, [configured]);
 
   const openAuthModal = (mode: AuthModalMode = 'login') => {

@@ -12,7 +12,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || '',
 };
 
-export const FIRESTORE_DATABASE_ID = 'marca-paginas';
+export const FIRESTORE_DATABASE_ID = import.meta.env.VITE_FIREBASE_DATABASE_ID || 'marca-paginas';
 
 export const isFirebaseConfigured = (): boolean => {
   return Boolean(
@@ -34,7 +34,14 @@ if (isFirebaseConfigured()) {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     auth = getAuth(app);
-    db = getFirestore(app, FIRESTORE_DATABASE_ID);
+    try {
+      db = FIRESTORE_DATABASE_ID && FIRESTORE_DATABASE_ID !== '(default)'
+        ? getFirestore(app, FIRESTORE_DATABASE_ID)
+        : getFirestore(app);
+    } catch (dbErr) {
+      console.warn('Tentando fallback para Firestore default database:', dbErr);
+      db = getFirestore(app);
+    }
     googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
   } catch (err) {
