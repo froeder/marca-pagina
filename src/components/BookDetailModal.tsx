@@ -44,7 +44,7 @@ export const BookDetailModalInner: React.FC<{
   const [savedAlert, setSavedAlert] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1C130A]/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[70] bg-[#1C130A]/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="relative bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-5 sm:p-6 border border-[#E6DCCF]">
         <button
           onClick={onClose}

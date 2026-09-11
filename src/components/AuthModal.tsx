@@ -89,7 +89,7 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1C130A]/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#1C130A]/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-[#E6DCCF] overflow-hidden" onClick={(e) => e.stopPropagation()}>
         {/* TOP BANNER */}
         <div className="bg-[#382A24] px-6 py-5 text-[#FAF6F0] flex items-center justify-between border-b border-[#2C1F13]">

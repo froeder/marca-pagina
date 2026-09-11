@@ -24,7 +24,7 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8F5EE] text-[#2D241E] flex flex-col selection:bg-[#422F1D] selection:text-[#FAF6F0] font-sans antialiased pb-16 sm:pb-[68px]">
+    <div className="min-h-screen bg-[#F8F5EE] text-[#2D241E] flex flex-col selection:bg-[#422F1D] selection:text-[#FAF6F0] font-sans antialiased pb-20 sm:pb-24">
       <Navbar onSelectTab={setActiveTab} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
