@@ -63,8 +63,16 @@ export function translateFirebaseError(errorCode: string): string {
       return 'A janela de autenticação do Google foi fechada antes de concluir.';
     case 'auth/popup-blocked':
       return 'O navegador bloqueou o popup de login. Por favor, libere popups para este site.';
+    case 'auth/cancelled-popup-request':
+      return 'A solicitação de login foi cancelada.';
     case 'auth/operation-not-allowed':
-      return 'Este método de login não está ativado no console do Firebase.';
+      return 'O provedor Google não está ativado no Firebase Console (Authentication > Sign-in method).';
+    case 'auth/unauthorized-domain':
+      return 'Domínio não autorizado! Adicione o domínio da sua hospedagem (ex: vercel.app) no Firebase Console (Authentication > Settings > Authorized domains).';
+    case 'auth/account-exists-with-different-credential':
+      return 'Já existe uma conta com este e-mail usando outro método de login.';
+    case 'auth/invalid-api-key':
+      return 'Chave de API do Firebase inválida. Verifique as variáveis de ambiente de produção.';
     case 'auth/network-request-failed':
       return 'Falha de conexão. Verifique sua internet e tente novamente.';
     case 'auth/too-many-requests':
@@ -72,6 +80,8 @@ export function translateFirebaseError(errorCode: string): string {
     case 'auth/requires-recent-login':
       return 'Esta ação requer que você faça login novamente.';
     default:
-      return 'Ocorreu um erro ao processar a autenticação. Tente novamente.';
+      return errorCode
+        ? `Erro de autenticação (${errorCode}). Tente novamente.`
+        : 'Ocorreu um erro ao processar a autenticação. Tente novamente.';
   }
 }

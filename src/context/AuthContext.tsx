@@ -74,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signInWithEmailAndPassword(auth, email.trim(), pass);
       closeAuthModal();
     } catch (err: unknown) {
+      console.error('Erro ao fazer login com e-mail:', err);
       const firebaseError = err as { code?: string; message?: string };
       throw new Error(translateFirebaseError(firebaseError.code || ''));
     }
@@ -88,6 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       closeAuthModal();
     } catch (err: unknown) {
+      console.error('Erro ao cadastrar usuário:', err);
       const firebaseError = err as { code?: string; message?: string };
       throw new Error(translateFirebaseError(firebaseError.code || ''));
     }
@@ -99,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signInWithPopup(auth, googleProvider);
       closeAuthModal();
     } catch (err: unknown) {
+      console.error('Erro no login com Google:', err);
       const firebaseError = err as { code?: string; message?: string };
       if (firebaseError.code === 'auth/popup-closed-by-user') {
         return; // Usuário apenas fechou a janela

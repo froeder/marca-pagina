@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { GoogleBookItem, SavedBook, ReadingStatus } from '../types/book';
 import { searchBooks } from '../services/googleBooksApi';
 import { getSavedBooks, addOrUpdateFromGoogleBook, updateBookStatus, toggleFavorite, updateBookReview } from '../services/storageService';
 import { BookCard } from '../components/BookCard';
 import { BookDetailModal } from '../components/BookDetailModal';
-import { Search, Loader2, Sparkles, BookOpen, AlertCircle } from 'lucide-react';
+import { Search, Loader2, Sparkles, BookOpen, AlertCircle, X } from 'lucide-react';
 
 const SUGGESTED_QUERIES = [
   'Literatura Brasileira',
@@ -25,31 +25,81 @@ export const SearchPage: React.FC = () => {
   const [savedBooks, setSavedBooks] = useState<SavedBook[]>(getSavedBooks);
   const [selectedBook, setSelectedBook] = useState<GoogleBookItem | SavedBook | null>(null);
 
+  const activeRequestId = useRef(0);
+
   useEffect(() => {
     const handleUpdate = () => setSavedBooks(getSavedBooks());
     window.addEventListener('marca_pagina_books_updated', handleUpdate);
     return () => window.removeEventListener('marca_pagina_books_updated', handleUpdate);
   }, []);
 
-  const handleSearch = async (searchTerm: string) => {
+  const performSearch = useCallback(async (searchTerm: string) => {
     const term = searchTerm.trim();
-    if (!term) return;
+    if (!term) {
+      setResults([]);
+      setHasSearched(false);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    const currentReqId = ++activeRequestId.current;
     setLoading(true);
     setError(null);
     setHasSearched(true);
     try {
       const response = await searchBooks(term, 24);
-      setResults(response.items);
+      if (activeRequestId.current === currentReqId) {
+        setResults(response.items);
+      }
     } catch {
-      setError('Erro ao consultar a Google Books API. Verifique sua conexão ou chave de API.');
+      if (activeRequestId.current === currentReqId) {
+        setError('Erro ao consultar a Google Books API. Verifique sua conexão ou chave de API.');
+      }
     } finally {
-      setLoading(false);
+      if (activeRequestId.current === currentReqId) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
+
+  // Busca automática com debounce conforme digita
+  useEffect(() => {
+    const term = query.trim();
+
+    if (!term) {
+      setResults([]);
+      setHasSearched(false);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    if (term.length < 2) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      performSearch(term);
+    }, 400);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [query, performSearch]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSearch(query);
+    if (query.trim()) {
+      performSearch(query);
+    }
+  };
+
+  const handleClear = () => {
+    setQuery('');
+    setResults([]);
+    setHasSearched(false);
+    setError(null);
   };
 
   const handleStatusChange = (book: GoogleBookItem | SavedBook, status: ReadingStatus) => {
@@ -92,12 +142,24 @@ export const SearchPage: React.FC = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Digite o título, autor ou assunto (ex: Machado de Assis, Ficção)..."
-            className="w-full py-3 px-3 text-[#2D241E] placeholder:text-[#A89B91] bg-transparent text-xs sm:text-sm focus:outline-none"
+            className="w-full py-3 pl-3 pr-2 text-[#2D241E] placeholder:text-[#A89B91] bg-transparent text-xs sm:text-sm focus:outline-none"
           />
+
+          {query && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="p-1.5 mr-1 text-[#8C7D73] hover:text-[#2D241E] rounded-md transition-colors cursor-pointer"
+              title="Limpar busca"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+
           <button
             type="submit"
             disabled={loading || !query.trim()}
-            className="mr-2 px-4 py-2 rounded-lg bg-[#422F1D] hover:bg-[#2C1F13] text-[#FAF6F0] font-medium text-xs transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+            className="mr-2 px-4 py-2 rounded-lg bg-[#422F1D] hover:bg-[#2C1F13] text-[#FAF6F0] font-medium text-xs transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer shrink-0"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Buscar'}
           </button>
@@ -113,7 +175,7 @@ export const SearchPage: React.FC = () => {
               type="button"
               onClick={() => {
                 setQuery(item);
-                handleSearch(item);
+                performSearch(item);
               }}
               className="text-[11px] px-2.5 py-0.5 rounded-md bg-[#F4ECE1] hover:bg-[#E6D7C3] text-[#5F442A] border border-[#E6DCCF] transition-colors cursor-pointer"
             >
@@ -124,7 +186,7 @@ export const SearchPage: React.FC = () => {
       </div>
 
       <div>
-        {loading ? (
+        {loading && results.length === 0 ? (
           <div className="py-16 flex flex-col items-center justify-center space-y-2.5">
             <Loader2 className="w-6 h-6 text-[#422F1D] animate-spin" />
             <p className="text-xs font-medium text-[#7D6E65]">Buscando na Google Books API com langRestrict=pt...</p>
@@ -134,7 +196,7 @@ export const SearchPage: React.FC = () => {
             <AlertCircle className="w-5 h-5 text-rose-600 mx-auto mb-1.5" />
             <p className="text-xs font-medium text-rose-700">{error}</p>
           </div>
-        ) : hasSearched && results.length === 0 ? (
+        ) : hasSearched && results.length === 0 && !loading ? (
           <div className="p-10 text-center bg-white rounded-xl border border-[#E6DCCF] max-w-md mx-auto">
             <BookOpen className="w-8 h-8 text-[#D3BC9E] mx-auto mb-2" />
             <p className="font-sans font-semibold text-[#2D241E] text-sm">Nenhum livro encontrado</p>
@@ -143,8 +205,9 @@ export const SearchPage: React.FC = () => {
         ) : results.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-medium text-[#7D6E65]">
-                {results.length} livros encontrados para "{query}"
+              <span className="text-xs font-medium text-[#7D6E65] flex items-center gap-2">
+                <span>{results.length} livros encontrados para "{query}"</span>
+                {loading && <Loader2 className="w-3 h-3 text-[#8C7D73] animate-spin" />}
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
