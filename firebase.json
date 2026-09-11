@@ -1,7 +1,10 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
-  },
+  "firestore": [
+    {
+      "database": "marca-paginas",
+      "rules": "firestore.rules"
+    }
+  ],
   "hosting": {
     "site": "frojho-marca-paginas",
     "public": "dist",
