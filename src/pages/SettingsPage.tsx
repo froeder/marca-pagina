@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { getApiKey, setApiKey, exportLibraryJson, importLibraryJson, resetToDemoBooks } from '../services/storageService';
 import { useAuth } from '../context/AuthContext';
+import { APP_VERSION, BUILD_DATE } from '../version';
 import {
   Key, Download, Upload, RotateCcw, Check, Sparkles, AlertTriangle,
-  User, LogOut, Flame, CheckCircle2, AlertCircle
+  User, LogOut, Flame, CheckCircle2, AlertCircle, Tag, Calendar, ShieldCheck
 } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
@@ -56,11 +57,19 @@ export const SettingsPage: React.FC = () => {
   };
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-300">
-      <div>
-        <h1 className="font-sans font-bold text-2xl sm:text-3xl text-[#2D241E] tracking-tight">Configurações</h1>
-        <p className="text-xs sm:text-sm text-[#7D6E65] mt-1">
-          Gerenciamento de Conta Firebase, Google Books API e dados locais
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-sans font-bold text-2xl sm:text-3xl text-[#2D241E] tracking-tight">Configurações</h1>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EDE4D8] text-[#5C4533] border border-[#DFCFC0]">
+              <Tag className="w-3 h-3 text-[#7F5E3B]" />
+              v{APP_VERSION}
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-[#7D6E65] mt-1">
+            Gerenciamento de Conta Firebase, Google Books API, dados locais e versão do sistema
+          </p>
+        </div>
       </div>
 
       {/* FIREBASE & ACCOUNT CARD */}
@@ -250,14 +259,48 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-5 rounded-2xl bg-[#F4ECE1]/70 border border-[#E6DCCF] text-[#2D241E] space-y-1.5">
-        <div className="flex items-center gap-2 font-sans font-semibold text-[#2D241E] text-xs">
-          <Sparkles className="w-3.5 h-3.5 text-[#7F5E3B]" />
-          <span>Sobre o Marca-Página</span>
+      <div className="p-5 rounded-2xl bg-[#F4ECE1]/70 border border-[#E6DCCF] text-[#2D241E] space-y-4">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 font-sans font-semibold text-[#2D241E] text-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#7F5E3B]" />
+            <span>Sobre o Marca-Página</span>
+          </div>
+          <p className="text-xs leading-relaxed text-[#7D6E65]">
+            Marca-Página é um gerenciador de leitura inteligente focado na descoberta de livros por padrões e preferências. Integrado diretamente à Google Books API com filtragem em Língua Portuguesa (<code className="bg-[#E6D7C3]/60 px-1 py-0.5 rounded text-[#2D241E] font-mono text-[11px]">langRestrict=pt</code>).
+          </p>
         </div>
-        <p className="text-xs leading-relaxed text-[#7D6E65]">
-          Marca-Página é um gerenciador de leitura inteligente focado na descoberta de livros por padrões e preferências. Integrado diretamente à Google Books API com filtragem em Língua Portuguesa (<code className="bg-[#E6D7C3]/60 px-1 py-0.5 rounded text-[#2D241E] font-mono text-[11px]">langRestrict=pt</code>).
-        </p>
+
+        <div className="pt-3 border-t border-[#E6DCCF]/60 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs text-[#5C4533]">
+          <div className="bg-white/80 border border-[#E6DCCF] rounded-xl p-2.5 flex items-center gap-2.5">
+            <div className="p-1.5 bg-[#EDE4D8] text-[#7F5E3B] rounded-lg">
+              <Tag className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-semibold tracking-wider text-[#9C8C80]">Versão do App</div>
+              <div className="font-bold text-[#2D241E] text-xs">v{APP_VERSION}</div>
+            </div>
+          </div>
+
+          <div className="bg-white/80 border border-[#E6DCCF] rounded-xl p-2.5 flex items-center gap-2.5">
+            <div className="p-1.5 bg-[#EDE4D8] text-[#7F5E3B] rounded-lg">
+              <Calendar className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-semibold tracking-wider text-[#9C8C80]">Último Build</div>
+              <div className="font-medium text-[#2D241E] text-xs">{BUILD_DATE}</div>
+            </div>
+          </div>
+
+          <div className="bg-white/80 border border-[#E6DCCF] rounded-xl p-2.5 flex items-center gap-2.5">
+            <div className="p-1.5 bg-[#EDE4D8] text-[#7F5E3B] rounded-lg">
+              <ShieldCheck className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-semibold tracking-wider text-[#9C8C80]">Ambiente</div>
+              <div className="font-medium text-[#2D241E] text-xs capitalize">{import.meta.env.MODE === 'production' ? 'Produção' : 'Desenvolvimento'}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
