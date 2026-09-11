@@ -8,8 +8,8 @@ export { getApiKey, setApiKey } from './googleBooksApi';
 const STORAGE_KEY = 'marca_pagina_saved_books';
 const GOAL_KEY = 'marca_pagina_reading_goal';
 
-function cleanObject<T extends Record<string, any>>(obj: T): Partial<T> {
-  const cleaned: Record<string, any> = {};
+function cleanObject<T extends Record<string, unknown>>(obj: T): Partial<T> {
+  const cleaned: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(obj)) {
     if (value !== undefined) {
       cleaned[key] = value;
@@ -23,9 +23,16 @@ export async function syncBookToFirestore(book: SavedBook, userId?: string): Pro
   if (!db || !uid) return;
   try {
     const bookRef = doc(db, 'users', uid, 'books', book.id);
-    await setDoc(bookRef, cleanObject(book), { merge: true });
+    await setDoc(bookRef, cleanObject(book as unknown as Record<string, unknown>), { merge: true });
   } catch (err) {
-    console.error('Erro ao sincronizar livro com Firestore:', err);
+    const errorObj = err as { code?: string; message?: string };
+    if (errorObj?.code === 'permission-denied') {
+      console.warn(
+        'Firestore: Permissão negada ao salvar livro. Atualize as regras de segurança (firestore.rules) no Firebase Console.'
+      );
+    } else {
+      console.error('Erro ao sincronizar livro com Firestore:', err);
+    }
   }
 }
 
@@ -36,7 +43,14 @@ export async function removeBookFromFirestore(bookId: string, userId?: string): 
     const bookRef = doc(db, 'users', uid, 'books', bookId);
     await deleteDoc(bookRef);
   } catch (err) {
-    console.error('Erro ao remover livro do Firestore:', err);
+    const errorObj = err as { code?: string; message?: string };
+    if (errorObj?.code === 'permission-denied') {
+      console.warn(
+        'Firestore: Permissão negada ao remover livro. Atualize as regras de segurança (firestore.rules) no Firebase Console.'
+      );
+    } else {
+      console.error('Erro ao remover livro do Firestore:', err);
+    }
   }
 }
 
@@ -47,7 +61,14 @@ export async function syncGoalToFirestore(goal: number, userId?: string): Promis
     const userRef = doc(db, 'users', uid);
     await setDoc(userRef, { readingGoal: goal }, { merge: true });
   } catch (err) {
-    console.error('Erro ao salvar meta no Firestore:', err);
+    const errorObj = err as { code?: string; message?: string };
+    if (errorObj?.code === 'permission-denied') {
+      console.warn(
+        'Firestore: Permissão negada ao salvar meta. Atualize as regras de segurança (firestore.rules) no Firebase Console.'
+      );
+    } else {
+      console.error('Erro ao salvar meta no Firestore:', err);
+    }
   }
 }
 
@@ -84,7 +105,13 @@ export function initFirestoreSync(userId: string): () => void {
       }
     },
     (error) => {
-      console.error('Erro na sincronização em tempo real do Firestore:', error);
+      if (error.code === 'permission-denied') {
+        console.warn(
+          'Firestore: Permissões insuficientes para sincronização em tempo real. Configure as regras de segurança do Firestore no Firebase Console (veja o arquivo firestore.rules gerado no projeto).'
+        );
+      } else {
+        console.error('Erro na sincronização em tempo real do Firestore:', error);
+      }
     }
   );
 

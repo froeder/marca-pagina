@@ -149,6 +149,7 @@ export const SettingsPage: React.FC = () => {
             <ol className="list-decimal list-inside space-y-1 text-[11px] text-[#7D6E65]">
               <li>Crie um projeto no <a href="https://console.firebase.google.com" target="_blank" rel="noreferrer" className="text-[#422F1D] underline font-medium">console.firebase.google.com</a>.</li>
               <li>Ative o <strong>Authentication</strong> (provedores E-mail/Senha e Google).</li>
+              <li>Crie um banco no <strong>Cloud Firestore</strong> e configure as regras de segurança (<code className="bg-white px-1 py-0.5 rounded font-mono text-[#2D241E] border border-[#E6DCCF]">firestore.rules</code>).</li>
               <li>Preencha as variáveis de ambiente no arquivo <code className="bg-white px-1 py-0.5 rounded font-mono text-[#2D241E] border border-[#E6DCCF]">.env</code>.</li>
             </ol>
             <div className="mt-2 text-[10px] font-mono bg-white p-2.5 rounded-lg border border-[#E6DCCF] text-[#5F442A] overflow-x-auto">
