@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bookmark, Sparkles, Search, BookOpen, BarChart3, Settings, Menu, X, LogIn, LogOut, ChevronDown } from 'lucide-react';
+import { Bookmark, Sparkles, Search, BookOpen, BarChart3, Settings, Menu, X, LogIn, LogOut, ChevronDown, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 
 export type NavTab = 'discover' | 'search' | 'my-books' | 'stats' | 'settings';
@@ -13,7 +13,19 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCount }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { user, logout, openAuthModal } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { user, loading: authLoading, logout, openAuthModal } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+    } finally {
+      setIsLoggingOut(false);
+      setUserMenuOpen(false);
+      setMobileOpen(false);
+    }
+  };
 
   const navItems: Array<{ id: NavTab; label: string; icon: React.ReactNode }> = [
     { id: 'discover', label: 'Descoberta', icon: <Sparkles className="w-4 h-4" /> },
@@ -81,7 +93,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
           </nav>
 
           <div className="flex items-center space-x-2">
-            {user ? (
+            {authLoading ? (
+              <div className="w-20 h-8 rounded-lg bg-[#E6DCCF]/40 animate-pulse" />
+            ) : user ? (
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -114,11 +128,16 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
                       <span>Configurações</span>
                     </button>
                     <button
-                      onClick={() => { logout(); setUserMenuOpen(false); }}
-                      className="w-full px-3 py-2 text-left font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="w-full px-3 py-2 text-left font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer disabled:opacity-60"
                     >
-                      <LogOut className="w-3.5 h-3.5 text-rose-500" />
-                      <span>Sair da Conta</span>
+                      {isLoggingOut ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-500" />
+                      ) : (
+                        <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                      )}
+                      <span>{isLoggingOut ? 'Saindo...' : 'Sair da Conta'}</span>
                     </button>
                   </div>
                 )}
@@ -158,10 +177,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, readCou
                 </div>
               </div>
               <button
-                onClick={() => { logout(); setMobileOpen(false); }}
-                className="text-xs font-medium text-rose-600 hover:text-rose-700 cursor-pointer"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="text-xs font-medium text-rose-600 hover:text-rose-700 cursor-pointer flex items-center gap-1 disabled:opacity-60"
               >
-                Sair
+                {isLoggingOut && <Loader2 className="w-3 h-3 animate-spin text-rose-600" />}
+                <span>{isLoggingOut ? 'Saindo...' : 'Sair'}</span>
               </button>
             </div>
           ) : (

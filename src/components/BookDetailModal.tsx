@@ -3,7 +3,7 @@ import type { GoogleBookItem, SavedBook, ReadingStatus } from '../types/book';
 import { formatAuthors, formatYear } from '../utils/formatters';
 import { sanitizeImageUrl, getBookCoverFallback } from '../utils/imageUtils';
 import { CategoryBadge } from './CategoryBadge';
-import { X, ExternalLink, Star, CheckCircle, Clock, Bookmark, Heart, BookOpen, Trash2 } from 'lucide-react';
+import { X, ExternalLink, Star, CheckCircle, Clock, Bookmark, Heart, BookOpen, Trash2, Loader2, Check } from 'lucide-react';
 
 interface Props {
   book: GoogleBookItem | SavedBook | null;
@@ -40,6 +40,7 @@ export const BookDetailModalInner: React.FC<{
   const isFav = savedData?.favorite || (!isG ? book.favorite : false);
   const [rating, setRating] = useState(savedData?.userRating || (!isG ? book.userRating || 0 : 0));
   const [notes, setNotes] = useState(savedData?.userNotes || (!isG ? book.userNotes || '' : ''));
+  const [isSaving, setIsSaving] = useState(false);
   const [savedAlert, setSavedAlert] = useState(false);
 
   return (
@@ -206,13 +207,23 @@ export const BookDetailModalInner: React.FC<{
           <div className="flex justify-end mt-2">
             <button
               onClick={() => {
+                setIsSaving(true);
                 onSaveReview?.(book.id, rating, notes);
-                setSavedAlert(true);
-                setTimeout(() => setSavedAlert(false), 2000);
+                setTimeout(() => {
+                  setIsSaving(false);
+                  setSavedAlert(true);
+                  setTimeout(() => setSavedAlert(false), 2500);
+                }, 250);
               }}
-              className="px-3 py-1.5 bg-[#422F1D] hover:bg-[#2C1F13] text-[#FAF6F0] text-xs font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
+              disabled={isSaving}
+              className="px-3 py-1.5 bg-[#422F1D] hover:bg-[#2C1F13] text-[#FAF6F0] text-xs font-medium rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
             >
-              Salvar Anotações
+              {isSaving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : savedAlert ? (
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+              ) : null}
+              <span>{isSaving ? 'Salvando...' : savedAlert ? 'Salvo!' : 'Salvar Anotações'}</span>
             </button>
           </div>
         </div>

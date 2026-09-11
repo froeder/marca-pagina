@@ -1,11 +1,13 @@
 import React from 'react';
 import { normalizeCategoryName, getCategoryColor } from '../utils/categoryUtils';
+import { Loader2 } from 'lucide-react';
 
 interface CategoryBadgeProps {
   category: string;
   className?: string;
   onClick?: () => void;
   selected?: boolean;
+  isLoading?: boolean;
 }
 
 export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
@@ -13,6 +15,7 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
   className = '',
   onClick,
   selected = false,
+  isLoading = false,
 }) => {
   const displayName = normalizeCategoryName(category);
   const color = getCategoryColor(category);
@@ -22,13 +25,15 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer ${
+        disabled={isLoading && selected}
+        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:cursor-default ${
           selected
             ? 'bg-[#422F1D] text-[#FAF6F0] border-[#422F1D] shadow-xs'
             : `${color.bg} ${color.border} hover:border-[#BA9B77] hover:text-[#2D241E]`
         } ${className}`}
       >
-        {displayName}
+        <span>{displayName}</span>
+        {selected && isLoading && <Loader2 className="w-2.5 h-2.5 text-[#D3BC9E] animate-spin" />}
       </button>
     );
   }

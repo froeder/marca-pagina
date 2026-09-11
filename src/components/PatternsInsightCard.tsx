@@ -92,6 +92,7 @@ export const PatternsInsightCard: React.FC<PatternsInsightCardProps> = ({
                 <CategoryBadge
                   category={cat.name}
                   selected={isSelected}
+                  isLoading={isLoading}
                   onClick={() => onSelectCategory(cat.name)}
                 />
                 <span className="ml-1 text-[11px] font-medium text-[#8C7D73]">

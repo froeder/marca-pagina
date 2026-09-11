@@ -178,19 +178,28 @@ export const SearchPage: React.FC = () => {
           <span className="text-[11px] text-[#7D6E65] font-medium mr-1 flex items-center gap-1">
             <Sparkles className="w-3 h-3 text-[#A05E35]" /> Sugestões:
           </span>
-          {SUGGESTED_QUERIES.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => {
-                setQuery(item);
-                performSearch(item);
-              }}
-              className="text-[11px] px-2.5 py-0.5 rounded-md bg-[#F4ECE1] hover:bg-[#E6D7C3] text-[#5F442A] border border-[#E6DCCF] transition-colors cursor-pointer"
-            >
-              {item}
-            </button>
-          ))}
+          {SUGGESTED_QUERIES.map((item) => {
+            const isThisSearching = loading && query === item;
+            return (
+              <button
+                key={item}
+                type="button"
+                disabled={loading}
+                onClick={() => {
+                  setQuery(item);
+                  performSearch(item);
+                }}
+                className={`text-[11px] px-2.5 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                  isThisSearching
+                    ? 'bg-[#422F1D] text-[#FAF6F0] border border-[#422F1D] shadow-xs'
+                    : 'bg-[#F4ECE1] hover:bg-[#E6D7C3] text-[#5F442A] border border-[#E6DCCF] disabled:opacity-60'
+                }`}
+              >
+                <span>{item}</span>
+                {isThisSearching && <Loader2 className="w-2.5 h-2.5 text-[#D3BC9E] animate-spin" />}
+              </button>
+            );
+          })}
         </div>
       </div>
 

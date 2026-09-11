@@ -4,20 +4,37 @@ import { useAuth } from '../context/useAuth';
 import { APP_VERSION, BUILD_DATE } from '../version';
 import {
   Key, Download, Upload, RotateCcw, Check, Sparkles, AlertTriangle,
-  User, LogOut, Flame, CheckCircle2, AlertCircle, Tag, Calendar, ShieldCheck
+  User, LogOut, Flame, CheckCircle2, AlertCircle, Tag, Calendar, ShieldCheck, Loader2
 } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
   const { user, isConfigured, openAuthModal, logout } = useAuth();
   const [apiKeyInput, setApiKeyInput] = useState(getApiKey() || '');
+  const [isSavingKey, setIsSavingKey] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [importStatus, setImportStatus] = useState<string | null>(null);
 
   const handleSaveApiKey = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSavingKey(true);
     setApiKey(apiKeyInput.trim());
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
+    setTimeout(() => {
+      setIsSavingKey(false);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    }, 300);
+  };
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const handleExport = () => {
@@ -34,10 +51,12 @@ export const SettingsPage: React.FC = () => {
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setIsImporting(true);
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
       const success = importLibraryJson(content);
+      setIsImporting(false);
       if (success) {
         setImportStatus('Biblioteca restaurada com sucesso!');
       } else {
@@ -45,14 +64,23 @@ export const SettingsPage: React.FC = () => {
       }
       setTimeout(() => setImportStatus(null), 3000);
     };
+    reader.onerror = () => {
+      setIsImporting(false);
+      setImportStatus('Erro ao ler arquivo de backup.');
+      setTimeout(() => setImportStatus(null), 3000);
+    };
     reader.readAsText(file);
   };
 
   const handleResetDemo = () => {
     if (window.confirm('Deseja recarregar o acervo padrão de demonstração?')) {
-      resetToDemoBooks();
-      setImportStatus('Dados de demonstração recarregados com sucesso!');
-      setTimeout(() => setImportStatus(null), 3000);
+      setIsResetting(true);
+      setTimeout(() => {
+        resetToDemoBooks();
+        setIsResetting(false);
+        setImportStatus('Dados de demonstração recarregados com sucesso!');
+        setTimeout(() => setImportStatus(null), 3000);
+      }, 350);
     }
   };
   return (
@@ -112,11 +140,16 @@ export const SettingsPage: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={() => logout()}
-              className="px-3.5 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="px-3.5 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200/60 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sair da Conta</span>
+              {isLoggingOut ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-700" />
+              ) : (
+                <LogOut className="w-3.5 h-3.5" />
+              )}
+              <span>{isLoggingOut ? 'Saindo...' : 'Sair da Conta'}</span>
             </button>
           </div>
         ) : isConfigured ? (
@@ -189,10 +222,15 @@ export const SettingsPage: React.FC = () => {
               />
               <button
                 type="submit"
-                className="px-3.5 py-2 bg-[#422F1D] hover:bg-[#2C1F13] text-[#FAF6F0] text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                disabled={isSavingKey}
+                className="px-3.5 py-2 bg-[#422F1D] hover:bg-[#2C1F13] text-[#FAF6F0] text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
               >
-                {savedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : null}
-                <span>{savedSuccess ? 'Salvo!' : 'Salvar Chave'}</span>
+                {isSavingKey ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : savedSuccess ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                ) : null}
+                <span>{isSavingKey ? 'Salvando...' : savedSuccess ? 'Salvo!' : 'Salvar Chave'}</span>
               </button>
             </div>
           </div>
@@ -225,16 +263,25 @@ export const SettingsPage: React.FC = () => {
             <Download className="w-4 h-4 text-[#7F5E3B] shrink-0 ml-2" />
           </button>
 
-          <label className="flex items-center justify-between p-3.5 rounded-xl border border-[#E6DCCF] hover:border-[#D3BC9E] hover:bg-[#FAF7F2] transition-all cursor-pointer text-left">
+          <label className={`flex items-center justify-between p-3.5 rounded-xl border border-[#E6DCCF] hover:border-[#D3BC9E] hover:bg-[#FAF7F2] transition-all cursor-pointer text-left ${isImporting ? 'opacity-60 pointer-events-none' : ''}`}>
             <div className="space-y-0.5">
-              <div className="text-xs font-semibold text-[#2D241E]">Restaurar do Arquivo</div>
-              <div className="text-[11px] text-[#7D6E65]">Importar arquivo JSON</div>
+              <div className="text-xs font-semibold text-[#2D241E]">
+                {isImporting ? 'Restaurando...' : 'Restaurar do Arquivo'}
+              </div>
+              <div className="text-[11px] text-[#7D6E65]">
+                {isImporting ? 'Processando arquivo JSON...' : 'Importar arquivo JSON'}
+              </div>
             </div>
-            <Upload className="w-4 h-4 text-[#7F5E3B] shrink-0 ml-2" />
+            {isImporting ? (
+              <Loader2 className="w-4 h-4 text-[#7F5E3B] animate-spin shrink-0 ml-2" />
+            ) : (
+              <Upload className="w-4 h-4 text-[#7F5E3B] shrink-0 ml-2" />
+            )}
             <input
               type="file"
               accept="application/json"
               onChange={handleImportFile}
+              disabled={isImporting}
               className="hidden"
             />
           </label>
@@ -252,10 +299,15 @@ export const SettingsPage: React.FC = () => {
           </div>
           <button
             onClick={handleResetDemo}
-            className="px-3 py-1.5 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+            disabled={isResetting}
+            className="px-3 py-1.5 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200/60 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Restaurar</span>
+            {isResetting ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <RotateCcw className="w-3.5 h-3.5" />
+            )}
+            <span>{isResetting ? 'Restaurando...' : 'Restaurar'}</span>
           </button>
         </div>
       </div>
