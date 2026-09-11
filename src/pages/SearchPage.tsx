@@ -22,11 +22,10 @@ export const SearchPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
+  const [savedBooks, setSavedBooks] = useState<SavedBook[]>(getSavedBooks);
   const [selectedBook, setSelectedBook] = useState<GoogleBookItem | SavedBook | null>(null);
 
   useEffect(() => {
-    setSavedBooks(getSavedBooks());
     const handleUpdate = () => setSavedBooks(getSavedBooks());
     window.addEventListener('marca_pagina_books_updated', handleUpdate);
     return () => window.removeEventListener('marca_pagina_books_updated', handleUpdate);

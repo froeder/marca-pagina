@@ -12,47 +12,64 @@ interface DiscoverPageProps {
   onNavigateToMyBooks: () => void;
 }
 export const DiscoverPage: React.FC<DiscoverPageProps> = ({ onNavigateToSearch, onNavigateToMyBooks }) => {
+  const initialPatterns = analyzeReadingPatterns();
   const [loading, setLoading] = useState(true);
-  const [totalRead, setTotalRead] = useState(0);
-  const [topCategories, setTopCategories] = useState<CategoryStat[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [totalRead, setTotalRead] = useState(initialPatterns.totalRead);
+  const [topCategories, setTopCategories] = useState<CategoryStat[]>(initialPatterns.categories);
+  const [activeCategory, setActiveCategory] = useState<string | null>(initialPatterns.rawPrimaryCategory);
   const [recommendedBooks, setRecommendedBooks] = useState<GoogleBookItem[]>([]);
-  const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
+  const [savedBooks, setSavedBooks] = useState<SavedBook[]>(getSavedBooks);
   const [selectedBook, setSelectedBook] = useState<GoogleBookItem | SavedBook | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const loadRecommendations = useCallback(async (categoryOverride?: string) => {
+  const loadRecommendations = useCallback((categoryOverride?: string) => {
     setLoading(true);
     setErrorMsg(null);
-    try {
-      const currentSaved = getSavedBooks();
-      setSavedBooks(currentSaved);
-      const patterns = analyzeReadingPatterns();
-      setTotalRead(patterns.totalRead);
-      setTopCategories(patterns.categories);
-
-      const targetCat = categoryOverride !== undefined ? categoryOverride : (activeCategory || patterns.rawPrimaryCategory || undefined);
-      if (categoryOverride !== undefined) {
-        setActiveCategory(categoryOverride);
-      } else if (!activeCategory && patterns.rawPrimaryCategory) {
-        setActiveCategory(patterns.rawPrimaryCategory);
-      }
-
-      const result = await discoverBooksByPattern(targetCat || undefined);
-      setRecommendedBooks(result.recommendedBooks);
-    } catch {
-      setErrorMsg('Não foi possível carregar sugestões da Google Books API neste momento.');
-    } finally {
-      setLoading(false);
+    const targetCat = categoryOverride !== undefined ? categoryOverride : (activeCategory || undefined);
+    if (categoryOverride !== undefined) {
+      setActiveCategory(categoryOverride);
     }
+    discoverBooksByPattern(targetCat)
+      .then((result) => {
+        setRecommendedBooks(result.recommendedBooks);
+      })
+      .catch(() => {
+        setErrorMsg('Não foi possível carregar sugestões da Google Books API neste momento.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [activeCategory]);
 
   useEffect(() => {
-    loadRecommendations();
-    const handleStorageUpdate = () => setSavedBooks(getSavedBooks());
+    let isSubscribed = true;
+    discoverBooksByPattern(activeCategory || undefined)
+      .then((result) => {
+        if (isSubscribed) {
+          setRecommendedBooks(result.recommendedBooks);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (isSubscribed) {
+          setErrorMsg('Não foi possível carregar sugestões da Google Books API neste momento.');
+          setLoading(false);
+        }
+      });
+
+    const handleStorageUpdate = () => {
+      setSavedBooks(getSavedBooks());
+      const p = analyzeReadingPatterns();
+      setTotalRead(p.totalRead);
+      setTopCategories(p.categories);
+    };
+
     window.addEventListener('marca_pagina_books_updated', handleStorageUpdate);
-    return () => window.removeEventListener('marca_pagina_books_updated', handleStorageUpdate);
-  }, [loadRecommendations]);
+    return () => {
+      isSubscribed = false;
+      window.removeEventListener('marca_pagina_books_updated', handleStorageUpdate);
+    };
+  }, [activeCategory]);
 
   const handleStatusChange = (book: GoogleBookItem | SavedBook, status: ReadingStatus) => {
     if ('volumeInfo' in book) {

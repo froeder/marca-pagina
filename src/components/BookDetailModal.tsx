@@ -13,10 +13,16 @@ interface Props {
   onSaveReview?: (id: string, rating?: number, notes?: string) => void;
   onToggleFavorite?: (id: string) => void;
 }
-export const BookDetailModal: React.FC<Props> = ({
+export const BookDetailModalInner: React.FC<{
+  book: GoogleBookItem | SavedBook;
+  savedData?: SavedBook;
+  onClose: () => void;
+  onStatusChange: (b: GoogleBookItem | SavedBook, s: ReadingStatus) => void;
+  onSaveReview?: (id: string, rating?: number, notes?: string) => void;
+  onToggleFavorite?: (id: string) => void;
+}> = ({
   book, savedData, onClose, onStatusChange, onSaveReview, onToggleFavorite
 }) => {
-  if (!book) return null;
   const isG = 'volumeInfo' in book;
   const title = isG ? book.volumeInfo.title : book.title;
   const authors = isG ? book.volumeInfo.authors : book.authors;
@@ -91,4 +97,10 @@ export const BookDetailModal: React.FC<Props> = ({
     </div>
   );
 };
+
+export const BookDetailModal: React.FC<Props> = (props) => {
+  if (!props.book) return null;
+  return <BookDetailModalInner {...props} book={props.book} />;
+};
+
 

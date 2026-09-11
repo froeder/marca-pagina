@@ -5,14 +5,18 @@ import { Target, BookOpen, Layers, Star, Award, TrendingUp, Sparkles } from 'luc
 import { CategoryBadge } from '../components/CategoryBadge';
 
 export const StatsPage: React.FC<{ onNavigateToDiscover: () => void }> = ({ onNavigateToDiscover }) => {
-  const [books, setBooks] = useState(getSavedBooks());
-  const [goal, setGoal] = useState(getReadingGoal());
+  const [books, setBooks] = useState(getSavedBooks);
+  const [goal, setGoal] = useState(getReadingGoal);
   const [editingGoal, setEditingGoal] = useState(false);
   const [tempGoal, setTempGoal] = useState(goal);
 
   useEffect(() => {
-    setBooks(getSavedBooks());
-    setGoal(getReadingGoal());
+    const handleUpdate = () => {
+      setBooks(getSavedBooks());
+      setGoal(getReadingGoal());
+    };
+    window.addEventListener('marca_pagina_books_updated', handleUpdate);
+    return () => window.removeEventListener('marca_pagina_books_updated', handleUpdate);
   }, []);
 
   const readBooks = books.filter((b) => b.status === 'lido');

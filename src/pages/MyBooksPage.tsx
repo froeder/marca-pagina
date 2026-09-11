@@ -10,7 +10,7 @@ export const MyBooksPage: React.FC<{ onNavigateToSearch: () => void; onNavigateT
   onNavigateToSearch,
   onNavigateToDiscover,
 }) => {
-  const [books, setBooks] = useState<SavedBook[]>([]);
+  const [books, setBooks] = useState<SavedBook[]>(getSavedBooks);
   const [activeFilter, setActiveFilter] = useState<FilterTab>('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState<GoogleBookItem | SavedBook | null>(null);
@@ -18,7 +18,6 @@ export const MyBooksPage: React.FC<{ onNavigateToSearch: () => void; onNavigateT
   const loadBooks = () => setBooks(getSavedBooks());
 
   useEffect(() => {
-    loadBooks();
     window.addEventListener('marca_pagina_books_updated', loadBooks);
     return () => window.removeEventListener('marca_pagina_books_updated', loadBooks);
   }, []);

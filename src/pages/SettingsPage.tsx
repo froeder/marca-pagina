@@ -46,6 +46,9 @@ export const SettingsPage: React.FC = () => {
     if (window.confirm('Deseja recarregar o acervo padrão de demonstração?')) {
       resetToDemoBooks();
       setImportStatus('Dados de demonstração recarregados com sucesso!');
+      setTimeout(() => setImportStatus(null), 3000);
+    }
+  };
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-300">
       <div>
@@ -167,6 +170,3 @@ export const SettingsPage: React.FC = () => {
   );
 };
 
-      setTimeout(() => setImportStatus(null), 3000);
-    }
-  };
