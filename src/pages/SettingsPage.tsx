@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { getApiKey, setApiKey, exportLibraryJson, importLibraryJson, resetToDemoBooks } from '../services/storageService';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { APP_VERSION, BUILD_DATE } from '../version';
 import {
   Key, Download, Upload, RotateCcw, Check, Sparkles, AlertTriangle,

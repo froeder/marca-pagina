@@ -67,14 +67,6 @@ export const SearchPage: React.FC = () => {
   useEffect(() => {
     const term = query.trim();
 
-    if (!term) {
-      setResults([]);
-      setHasSearched(false);
-      setError(null);
-      setLoading(false);
-      return;
-    }
-
     if (term.length < 2) {
       return;
     }
@@ -148,7 +140,16 @@ export const SearchPage: React.FC = () => {
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setQuery(value);
+              if (!value.trim()) {
+                setResults([]);
+                setHasSearched(false);
+                setError(null);
+                setLoading(false);
+              }
+            }}
             placeholder="Digite o título, autor ou assunto (ex: Machado de Assis, Ficção)..."
             className="w-full py-3 pl-3 pr-2 text-[#2D241E] placeholder:text-[#A89B91] bg-transparent text-xs sm:text-sm focus:outline-none"
           />

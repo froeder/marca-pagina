@@ -117,9 +117,9 @@ export const MyBooksPage: React.FC<{ onNavigateToSearch: () => void; onNavigateT
 
       if (searchTerm.trim()) {
         const q = searchTerm.toLowerCase();
-        const matchTitle = book.title.toLowerCase().includes(q);
-        const matchAuthor = book.authors.some((a) => a.toLowerCase().includes(q));
-        const matchCat = book.categories.some((c) => c.toLowerCase().includes(q));
+        const matchTitle = (book.title || '').toLowerCase().includes(q);
+        const matchAuthor = (book.authors || []).some((a) => (a || '').toLowerCase().includes(q));
+        const matchCat = (book.categories || []).some((c) => (c || '').toLowerCase().includes(q));
         return matchTitle || matchAuthor || matchCat;
       }
       return true;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { useAuth } from '../context/useAuth';
 import {
   X, Mail, Lock, User as UserIcon, Eye, EyeOff, Sparkles, AlertCircle, CheckCircle2, Loader2, ArrowLeft, KeyRound
 } from 'lucide-react';
@@ -25,15 +25,6 @@ export const AuthModal: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (authModalOpen) {
-      setError(null);
-      setSuccessMessage(null);
-      setPassword('');
-      setConfirmPassword('');
-    }
-  }, [authModalOpen, authModalMode]);
 
   if (!authModalOpen) return null;
 

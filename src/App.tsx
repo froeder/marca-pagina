@@ -7,12 +7,14 @@ import { StatsPage } from './pages/StatsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AuthModal } from './components/AuthModal';
 import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/useAuth';
 import { getReadBooks } from './services/storageService';
 import { Bookmark, Sparkles } from 'lucide-react';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<NavTab>('discover');
   const [readCount, setReadCount] = useState(getReadBooks().length);
+  const { authModalOpen } = useAuth();
 
   useEffect(() => {
     const updateCount = () => setReadCount(getReadBooks().length);
@@ -70,7 +72,7 @@ function AppContent() {
         </div>
       </footer>
 
-      <AuthModal />
+      <AuthModal key={authModalOpen ? 'open' : 'closed'} />
     </div>
   );
 }

@@ -235,8 +235,19 @@ export function getSavedBooks(): SavedBook[] {
       return INITIAL_DEMO_BOOKS;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
+    if (!Array.isArray(parsed)) {
+      console.warn('Dados em localStorage (marca_pagina_saved_books) não são um array de livros.');
+      return [];
+    }
+    return parsed.map((b) => ({
+      ...b,
+      title: b.title || 'Sem título',
+      authors: Array.isArray(b.authors) && b.authors.length > 0 ? b.authors : ['Autor desconhecido'],
+      categories: Array.isArray(b.categories) && b.categories.length > 0 ? b.categories : ['Fiction'],
+      lists: Array.isArray(b.lists) ? b.lists : [],
+    }));
+  } catch (err) {
+    console.error('Erro ao ler livros salvos do localStorage:', err);
     return [];
   }
 }
@@ -254,6 +265,7 @@ export function addOrUpdateFromGoogleBook(
 ): SavedBook {
   const books = getSavedBooks();
   const existingIndex = books.findIndex((b) => b.id === googleBook.id);
+  const existing = existingIndex >= 0 ? books[existingIndex] : null;
   const thumbnail = sanitizeImageUrl(
     googleBook.volumeInfo.imageLinks?.thumbnail ||
     googleBook.volumeInfo.imageLinks?.smallThumbnail || ''
@@ -261,26 +273,33 @@ export function addOrUpdateFromGoogleBook(
 
   const bookData: SavedBook = {
     id: googleBook.id,
-    title: googleBook.volumeInfo.title || 'Sem título',
-    authors: googleBook.volumeInfo.authors || ['Autor desconhecido'],
-    thumbnail,
-    description: googleBook.volumeInfo.description || '',
-    categories: googleBook.volumeInfo.categories || ['Fiction'],
-    pageCount: googleBook.volumeInfo.pageCount,
-    publishedDate: googleBook.volumeInfo.publishedDate,
-    publisher: googleBook.volumeInfo.publisher,
-    previewLink: googleBook.volumeInfo.previewLink,
-    infoLink: googleBook.volumeInfo.infoLink,
+    title: googleBook.volumeInfo.title || existing?.title || 'Sem título',
+    authors: (googleBook.volumeInfo.authors && googleBook.volumeInfo.authors.length > 0)
+      ? googleBook.volumeInfo.authors
+      : (existing?.authors || ['Autor desconhecido']),
+    thumbnail: thumbnail || existing?.thumbnail || '',
+    description: googleBook.volumeInfo.description || existing?.description || '',
+    categories: (googleBook.volumeInfo.categories && googleBook.volumeInfo.categories.length > 0)
+      ? googleBook.volumeInfo.categories
+      : (existing?.categories || ['Fiction']),
+    pageCount: googleBook.volumeInfo.pageCount ?? existing?.pageCount,
+    publishedDate: googleBook.volumeInfo.publishedDate || existing?.publishedDate,
+    publisher: googleBook.volumeInfo.publisher || existing?.publisher,
+    previewLink: googleBook.volumeInfo.previewLink || existing?.previewLink,
+    infoLink: googleBook.volumeInfo.infoLink || existing?.infoLink,
     status,
-    userRating: rating,
-    userNotes: notes,
-    dateAdded: existingIndex >= 0 ? books[existingIndex].dateAdded : new Date().toISOString(),
-    dateFinished: status === 'lido' ? new Date().toISOString() : undefined,
-    favorite: existingIndex >= 0 ? books[existingIndex].favorite : false,
+    userRating: rating !== undefined ? rating : existing?.userRating,
+    userNotes: notes !== undefined ? notes : existing?.userNotes,
+    dateAdded: existing?.dateAdded || new Date().toISOString(),
+    dateFinished: status === 'lido'
+      ? (existing?.dateFinished || new Date().toISOString())
+      : existing?.dateFinished,
+    favorite: existing ? Boolean(existing.favorite) : false,
+    lists: existing?.lists || [],
   };
 
   if (existingIndex >= 0) {
-    books[existingIndex] = { ...books[existingIndex], ...bookData };
+    books[existingIndex] = bookData;
   } else {
     books.unshift(bookData);
   }
@@ -349,14 +368,46 @@ export function exportLibraryJson(): string {
 export function importLibraryJson(jsonString: string): boolean {
   try {
     const parsed = JSON.parse(jsonString);
-    const books = Array.isArray(parsed) ? parsed : (parsed.books || []);
-    if (!Array.isArray(books)) {
+    const rawBooks = Array.isArray(parsed) ? parsed : (parsed.books || []);
+    if (!Array.isArray(rawBooks)) {
       return false;
     }
-    saveBooks(books);
-    books.forEach((b) => syncBookToFirestore(b));
+    const sanitizedBooks: SavedBook[] = rawBooks
+      .filter((b): b is Record<string, unknown> => typeof b === 'object' && b !== null && typeof b.id === 'string' && b.id.trim() !== '')
+      .map((b) => ({
+        id: String(b.id),
+        title: typeof b.title === 'string' && b.title.trim() ? b.title : 'Sem título',
+        authors: Array.isArray(b.authors) && b.authors.length > 0
+          ? b.authors.map((a) => String(a || '')).filter(Boolean)
+          : ['Autor desconhecido'],
+        thumbnail: typeof b.thumbnail === 'string' ? sanitizeImageUrl(b.thumbnail) : '',
+        description: typeof b.description === 'string' ? b.description : '',
+        categories: Array.isArray(b.categories) && b.categories.length > 0
+          ? b.categories.map((c) => String(c || '')).filter(Boolean)
+          : ['Fiction'],
+        pageCount: typeof b.pageCount === 'number' && !isNaN(b.pageCount) ? b.pageCount : undefined,
+        publishedDate: typeof b.publishedDate === 'string' ? b.publishedDate : undefined,
+        publisher: typeof b.publisher === 'string' ? b.publisher : undefined,
+        previewLink: typeof b.previewLink === 'string' ? b.previewLink : undefined,
+        infoLink: typeof b.infoLink === 'string' ? b.infoLink : undefined,
+        status: (['quero_ler', 'lendo', 'lido'].includes(b.status as string) ? b.status : 'quero_ler') as ReadingStatus,
+        userRating: typeof b.userRating === 'number' ? b.userRating : undefined,
+        userNotes: typeof b.userNotes === 'string' ? b.userNotes : undefined,
+        dateAdded: typeof b.dateAdded === 'string' ? b.dateAdded : new Date().toISOString(),
+        dateFinished: typeof b.dateFinished === 'string' ? b.dateFinished : undefined,
+        favorite: Boolean(b.favorite),
+        lists: Array.isArray(b.lists) ? b.lists.map(String).filter(Boolean) : [],
+      }));
+
+    if (sanitizedBooks.length === 0 && rawBooks.length > 0) {
+      return false;
+    }
+
+    saveBooks(sanitizedBooks);
+    sanitizedBooks.forEach((b) => syncBookToFirestore(b));
     return true;
-  } catch {
+  } catch (err) {
+    console.error('Erro ao importar JSON da biblioteca:', err);
     return false;
   }
 }

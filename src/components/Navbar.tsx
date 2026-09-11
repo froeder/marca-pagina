@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Bookmark, Sparkles, Search, BookOpen, BarChart3, Settings, Menu, X, LogIn, LogOut, ChevronDown } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 export type NavTab = 'discover' | 'search' | 'my-books' | 'stats' | 'settings';
 

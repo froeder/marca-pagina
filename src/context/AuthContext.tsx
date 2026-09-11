@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { User } from 'firebase/auth';
 import {
   signInWithEmailAndPassword,
@@ -11,39 +11,17 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider, isFirebaseConfigured, translateFirebaseError } from '../services/firebase';
 import { initFirestoreSync, stopFirestoreSync } from '../services/storageService';
-
-export type AuthModalMode = 'login' | 'register' | 'forgot-password';
-
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  isConfigured: boolean;
-  authModalOpen: boolean;
-  authModalMode: AuthModalMode;
-  openAuthModal: (mode?: AuthModalMode) => void;
-  closeAuthModal: () => void;
-  setAuthModalMode: (mode: AuthModalMode) => void;
-  loginWithEmail: (email: string, pass: string) => Promise<void>;
-  signupWithEmail: (email: string, pass: string, displayName?: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  logout: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext, type AuthModalMode } from './useAuth';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const configured = isFirebaseConfigured();
+  const [loading, setLoading] = useState(() => !(configured && auth));
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<AuthModalMode>('login');
-  const configured = isFirebaseConfigured();
 
   useEffect(() => {
-    if (!configured || !auth) {
-      setLoading(false);
-      return;
-    }
+    if (!configured || !auth) return;
 
     const unsubscribe = onAuthStateChanged(
       auth,
@@ -85,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: unknown) {
       console.error('Erro ao fazer login com e-mail:', err);
       const firebaseError = err as { code?: string; message?: string };
-      throw new Error(translateFirebaseError(firebaseError.code || ''));
+      throw new Error(translateFirebaseError(firebaseError.code || ''), { cause: err });
     }
   };
 
@@ -100,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: unknown) {
       console.error('Erro ao cadastrar usuário:', err);
       const firebaseError = err as { code?: string; message?: string };
-      throw new Error(translateFirebaseError(firebaseError.code || ''));
+      throw new Error(translateFirebaseError(firebaseError.code || ''), { cause: err });
     }
   };
 
@@ -115,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (firebaseError.code === 'auth/popup-closed-by-user') {
         return; // Usuário apenas fechou a janela
       }
-      throw new Error(translateFirebaseError(firebaseError.code || ''));
+      throw new Error(translateFirebaseError(firebaseError.code || ''), { cause: err });
     }
   };
 
@@ -134,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await sendPasswordResetEmail(auth, email.trim());
     } catch (err: unknown) {
       const firebaseError = err as { code?: string; message?: string };
-      throw new Error(translateFirebaseError(firebaseError.code || ''));
+      throw new Error(translateFirebaseError(firebaseError.code || ''), { cause: err });
     }
   };
 
@@ -159,12 +137,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
-  }
-  return context;
 };
