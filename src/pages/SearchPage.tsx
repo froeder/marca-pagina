@@ -207,7 +207,7 @@ export const SearchPage: React.FC = () => {
         {loading && results.length === 0 ? (
           <div className="py-16 flex flex-col items-center justify-center space-y-2.5">
             <Loader2 className="w-6 h-6 text-[#422F1D] animate-spin" />
-            <p className="text-xs font-medium text-[#7D6E65]">Buscando na Google Books API com langRestrict=pt...</p>
+            <p className="text-xs font-medium text-[#7D6E65]">Buscando na Google Books API com langRestrict=pt-BR...</p>
           </div>
         ) : error ? (
           <div className="p-5 bg-rose-50/70 border border-rose-200 rounded-xl text-center max-w-lg mx-auto">

@@ -22,11 +22,16 @@ export function setApiKey(key: string): void {
 }
 
 /**
- * Constrói a URL completa adicionando a chave se existente
+ * Constrói a URL completa adicionando a chave se existente e configurando hl=pt-BR por padrão
  */
 function buildUrl(endpoint: string, params: Record<string, string | number>): string {
   const url = new URL(endpoint);
   
+  // Define o idioma de interface/metadados como pt-BR por padrão
+  if (!params.hl) {
+    url.searchParams.append('hl', 'pt-BR');
+  }
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       url.searchParams.append(key, String(value));
@@ -69,13 +74,14 @@ function sanitizeBookItem(item: GoogleBookItem): GoogleBookItem {
 }
 
 /**
- * Busca livros por texto livre utilizando langRestrict=pt
- * Endpoint: https://www.googleapis.com/books/v1/volumes?q={texto}&langRestrict=pt&key=SUA_API_KEY
+ * Busca livros por texto livre utilizando langRestrict=pt-BR
+ * Endpoint: https://www.googleapis.com/books/v1/volumes?q={texto}&langRestrict=pt-BR&hl=pt-BR&key=SUA_API_KEY
  */
 export async function searchBooks(
   query: string,
   maxResults = 20,
-  startIndex = 0
+  startIndex = 0,
+  langRestrict = 'pt-BR'
 ): Promise<{ items: GoogleBookItem[]; totalItems: number }> {
   if (!query.trim()) {
     return { items: [], totalItems: 0 };
@@ -83,7 +89,8 @@ export async function searchBooks(
 
   const url = buildUrl(BASE_URL, {
     q: query.trim(),
-    langRestrict: 'pt',
+    langRestrict,
+    hl: 'pt-BR',
     maxResults,
     startIndex,
     orderBy: 'relevance',
@@ -110,13 +117,14 @@ export async function searchBooks(
 }
 
 /**
- * Busca livros por assunto / categoria utilizando langRestrict=pt
- * Endpoint: https://www.googleapis.com/books/v1/volumes?q=subject:{categoria_principal}&langRestrict=pt&key=SUA_API_KEY
+ * Busca livros por assunto / categoria utilizando langRestrict=pt-BR e hl=pt-BR
+ * Endpoint: https://www.googleapis.com/books/v1/volumes?q=subject:{categoria_principal}&langRestrict=pt-BR&hl=pt-BR&key=SUA_API_KEY
  */
 export async function searchBooksBySubject(
   subject: string,
   maxResults = 20,
-  startIndex = 0
+  startIndex = 0,
+  langRestrict = 'pt-BR'
 ): Promise<{ items: GoogleBookItem[]; totalItems: number }> {
   if (!subject.trim()) {
     return { items: [], totalItems: 0 };
@@ -128,7 +136,8 @@ export async function searchBooksBySubject(
 
   const url = buildUrl(BASE_URL, {
     q: query,
-    langRestrict: 'pt',
+    langRestrict,
+    hl: 'pt-BR',
     maxResults,
     startIndex,
     orderBy: 'relevance',
@@ -140,7 +149,8 @@ export async function searchBooksBySubject(
       // Se falhar com subject específico, tenta buscar a query normal com o termo
       const fallbackUrl = buildUrl(BASE_URL, {
         q: subject.trim(),
-        langRestrict: 'pt',
+        langRestrict,
+        hl: 'pt-BR',
         maxResults,
         startIndex,
       });
@@ -156,29 +166,27 @@ export async function searchBooksBySubject(
     }
 
     const data: GoogleBooksResponse = await response.json();
-    const items = (data.items || []).map(sanitizeBookItem);
+    let items = (data.items || []).map(sanitizeBookItem);
 
     // Se o retorno com subject: for vazio ou muito pequeno, tenta fallback de texto simples
     if (items.length === 0) {
       const fallbackUrl = buildUrl(BASE_URL, {
         q: subject.trim(),
-        langRestrict: 'pt',
+        langRestrict,
+        hl: 'pt-BR',
         maxResults,
         startIndex,
       });
       const fbRes = await fetch(fallbackUrl);
       if (fbRes.ok) {
         const fbData: GoogleBooksResponse = await fbRes.json();
-        return {
-          items: (fbData.items || []).map(sanitizeBookItem),
-          totalItems: fbData.totalItems || 0,
-        };
+        items = (fbData.items || []).map(sanitizeBookItem);
       }
     }
 
     return {
       items,
-      totalItems: data.totalItems || 0,
+      totalItems: data.totalItems || items.length,
     };
   } catch (error) {
     console.error(`Erro ao buscar por assunto (${subject}):`, error);
@@ -190,7 +198,9 @@ export async function searchBooksBySubject(
  * Busca um livro pelo seu identificador único do Google Books
  */
 export async function getBookById(id: string): Promise<GoogleBookItem> {
-  const url = buildUrl(`${BASE_URL}/${encodeURIComponent(id)}`, {});
+  const url = buildUrl(`${BASE_URL}/${encodeURIComponent(id)}`, {
+    hl: 'pt-BR',
+  });
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Livro não encontrado: ${response.status}`);

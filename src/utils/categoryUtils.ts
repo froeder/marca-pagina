@@ -32,6 +32,9 @@ const CATEGORY_TRANSLATIONS: Record<string, string> = {
   'religion': 'Religião & Espiritualidade',
   'cooking': 'Gastronomia & Culinária',
   'travel': 'Viagens & Turismo',
+  'classics': 'Clássicos',
+  'literary': 'Literatura',
+  'literature': 'Literatura',
 };
 
 /**
@@ -63,9 +66,12 @@ export function normalizeCategoryName(rawCategory: string): string {
  * Retorna o termo de busca ideal para consulta na Google Books API (ex: subject:{categoria})
  */
 export function getSearchSubjectTerm(category: string): string {
+  const normalized = normalizeCategoryName(category);
+  if (normalized && normalized !== 'Geral') {
+    return normalized;
+  }
   // Remove caracteres especiais que podem quebrar a query
   const clean = category.split('/')[0].trim();
-  // Se contiver espaços, podemos colocar entre aspas ou usar a própria palavra
   return clean;
 }
 

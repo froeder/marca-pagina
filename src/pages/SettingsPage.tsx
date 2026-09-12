@@ -319,7 +319,7 @@ export const SettingsPage: React.FC = () => {
             <span>Sobre o Marca-Página</span>
           </div>
           <p className="text-xs leading-relaxed text-[#7D6E65]">
-            Marca-Página é um gerenciador de leitura inteligente focado na descoberta de livros por padrões e preferências. Integrado diretamente à Google Books API com filtragem em Língua Portuguesa (<code className="bg-[#E6D7C3]/60 px-1 py-0.5 rounded text-[#2D241E] font-mono text-[11px]">langRestrict=pt</code>).
+            Marca-Página é um gerenciador de leitura inteligente focado na descoberta de livros por padrões e preferências. Integrado diretamente à Google Books API com filtragem em Língua Portuguesa (<code className="bg-[#E6D7C3]/60 px-1 py-0.5 rounded text-[#2D241E] font-mono text-[11px]">langRestrict=pt-BR</code>).
           </p>
         </div>
 

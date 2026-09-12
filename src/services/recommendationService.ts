@@ -84,17 +84,19 @@ export async function discoverBooksByPattern(selectedCategory?: string): Promise
     };
   }
 
-  const categoryToSearch = selectedCategory || pattern.rawPrimaryCategory || pattern.primaryCategory || 'Fiction';
+  const categoryToSearch = selectedCategory || pattern.primaryCategory || pattern.rawPrimaryCategory || 'Ficção';
   const searchTerm = getSearchSubjectTerm(categoryToSearch);
 
   try {
-    const { items } = await searchBooksBySubject(searchTerm, 25);
+    const { items } = await searchBooksBySubject(searchTerm, 30, 0, 'pt-BR');
     
-    // Filtra livros que o usuário já salvou
+    // Filtra livros que o usuário já salvou e garante resultados em português (pt-BR / pt)
     const filteredRecommendations = (items || []).filter((item: GoogleBookItem) => {
       const isSavedId = savedIds.has(item.id);
       const isSavedTitle = savedTitles.has((item.volumeInfo.title || '').toLowerCase().trim());
-      return !isSavedId && !isSavedTitle;
+      const lang = (item.volumeInfo.language || '').toLowerCase().trim();
+      const isPortuguese = !lang || lang.startsWith('pt') || lang === 'por';
+      return !isSavedId && !isSavedTitle && isPortuguese;
     });
 
     return {

@@ -204,7 +204,7 @@ const INITIAL_DEMO_BOOKS: SavedBook[] = [
     authors: ['Machado de Assis'],
     thumbnail: 'https://books.google.com/books/content?id=s1gVAAAAYAAJ&printsec=frontcover&img=1&zoom=1',
     description: 'Um dos maiores clássicos da literatura brasileira.',
-    categories: ['Fiction', 'Classics'],
+    categories: ['Ficção', 'Literatura Brasileira'],
     status: 'lido',
     userRating: 5,
     userNotes: 'Obra-prima atemporal.',
@@ -218,7 +218,7 @@ const INITIAL_DEMO_BOOKS: SavedBook[] = [
     authors: ['Itamar Vieira Junior'],
     thumbnail: 'https://books.google.com/books/content?id=kLAwDwAAQBAJ&printsec=frontcover&img=1&zoom=1',
     description: 'Saga marcante no sertão baiano.',
-    categories: ['Fiction', 'Literary'],
+    categories: ['Ficção', 'Literatura Brasileira'],
     status: 'lido',
     userRating: 5,
     dateAdded: '2026-02-05T14:00:00.000Z',
@@ -243,7 +243,7 @@ export function getSavedBooks(): SavedBook[] {
       ...b,
       title: b.title || 'Sem título',
       authors: Array.isArray(b.authors) && b.authors.length > 0 ? b.authors : ['Autor desconhecido'],
-      categories: Array.isArray(b.categories) && b.categories.length > 0 ? b.categories : ['Fiction'],
+      categories: Array.isArray(b.categories) && b.categories.length > 0 ? b.categories : ['Ficção'],
       lists: Array.isArray(b.lists) ? b.lists : [],
     }));
   } catch (err) {
@@ -384,7 +384,7 @@ export function importLibraryJson(jsonString: string): boolean {
         description: typeof b.description === 'string' ? b.description : '',
         categories: Array.isArray(b.categories) && b.categories.length > 0
           ? b.categories.map((c) => String(c || '')).filter(Boolean)
-          : ['Fiction'],
+          : ['Ficção'],
         pageCount: typeof b.pageCount === 'number' && !isNaN(b.pageCount) ? b.pageCount : undefined,
         publishedDate: typeof b.publishedDate === 'string' ? b.publishedDate : undefined,
         publisher: typeof b.publisher === 'string' ? b.publisher : undefined,
