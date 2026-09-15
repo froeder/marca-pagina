@@ -22,7 +22,7 @@ export function setApiKey(key: string): void {
 }
 
 /**
- * Constrói a URL completa adicionando a chave se existente e configurando hl=pt-BR por padrão
+ * Constrói a URL completa adicionando a chave se existente e configurando hl=pt-BR e printType=books por padrão
  */
 function buildUrl(endpoint: string, params: Record<string, string | number>): string {
   const url = new URL(endpoint);
@@ -30,6 +30,11 @@ function buildUrl(endpoint: string, params: Record<string, string | number>): st
   // Define o idioma de interface/metadados como pt-BR por padrão
   if (!params.hl) {
     url.searchParams.append('hl', 'pt-BR');
+  }
+
+  // Define tipo de impressão como books para evitar revistas/periódicos (ex: Trip, Placar)
+  if (!params.printType) {
+    url.searchParams.append('printType', 'books');
   }
 
   Object.entries(params).forEach(([key, value]) => {
@@ -74,14 +79,14 @@ function sanitizeBookItem(item: GoogleBookItem): GoogleBookItem {
 }
 
 /**
- * Busca livros por texto livre utilizando langRestrict=pt-BR
- * Endpoint: https://www.googleapis.com/books/v1/volumes?q={texto}&langRestrict=pt-BR&hl=pt-BR&key=SUA_API_KEY
+ * Busca livros por texto livre utilizando langRestrict=pt
+ * Endpoint: https://www.googleapis.com/books/v1/volumes?q={texto}&langRestrict=pt&hl=pt-BR&printType=books&key=SUA_API_KEY
  */
 export async function searchBooks(
   query: string,
   maxResults = 20,
   startIndex = 0,
-  langRestrict = 'pt-BR'
+  langRestrict = 'pt'
 ): Promise<{ items: GoogleBookItem[]; totalItems: number }> {
   if (!query.trim()) {
     return { items: [], totalItems: 0 };
@@ -91,6 +96,7 @@ export async function searchBooks(
     q: query.trim(),
     langRestrict,
     hl: 'pt-BR',
+    printType: 'books',
     maxResults,
     startIndex,
     orderBy: 'relevance',
@@ -104,11 +110,22 @@ export async function searchBooks(
     }
 
     const data: GoogleBooksResponse = await response.json();
-    const items = (data.items || []).map(sanitizeBookItem);
+    const items = (data.items || [])
+      .map(sanitizeBookItem)
+      .filter((item) => {
+        // Se a busca solicitou português, descarta itens explicitamente em outro idioma (ex: 'en', 'es')
+        if (langRestrict.startsWith('pt')) {
+          const lang = (item.volumeInfo?.language || '').toLowerCase().trim();
+          if (lang && !lang.startsWith('pt') && lang !== 'por') {
+            return false;
+          }
+        }
+        return true;
+      });
 
     return {
       items,
-      totalItems: data.totalItems || 0,
+      totalItems: data.totalItems || items.length,
     };
   } catch (error) {
     console.error('Erro ao buscar livros:', error);
@@ -117,14 +134,14 @@ export async function searchBooks(
 }
 
 /**
- * Busca livros por assunto / categoria utilizando langRestrict=pt-BR e hl=pt-BR
- * Endpoint: https://www.googleapis.com/books/v1/volumes?q=subject:{categoria_principal}&langRestrict=pt-BR&hl=pt-BR&key=SUA_API_KEY
+ * Busca livros por assunto / categoria utilizando langRestrict=pt e hl=pt-BR
+ * Endpoint: https://www.googleapis.com/books/v1/volumes?q=subject:{categoria_principal}&langRestrict=pt&hl=pt-BR&key=SUA_API_KEY
  */
 export async function searchBooksBySubject(
   subject: string,
   maxResults = 20,
   startIndex = 0,
-  langRestrict = 'pt-BR'
+  langRestrict = 'pt'
 ): Promise<{ items: GoogleBookItem[]; totalItems: number }> {
   if (!subject.trim()) {
     return { items: [], totalItems: 0 };
@@ -134,10 +151,20 @@ export async function searchBooksBySubject(
   const formattedSubject = subject.includes(' ') ? `"${subject.trim()}"` : subject.trim();
   const query = `subject:${formattedSubject}`;
 
+  const isPt = langRestrict.startsWith('pt');
+  const filterPt = (items: GoogleBookItem[]) => {
+    if (!isPt) return items;
+    return items.filter((item) => {
+      const lang = (item.volumeInfo?.language || '').toLowerCase().trim();
+      return lang.startsWith('pt') || lang === 'por';
+    });
+  };
+
   const url = buildUrl(BASE_URL, {
     q: query,
     langRestrict,
     hl: 'pt-BR',
+    printType: 'books',
     maxResults,
     startIndex,
     orderBy: 'relevance',
@@ -148,9 +175,10 @@ export async function searchBooksBySubject(
     if (!response.ok) {
       // Se falhar com subject específico, tenta buscar a query normal com o termo
       const fallbackUrl = buildUrl(BASE_URL, {
-        q: subject.trim(),
+        q: `livros ${subject.trim()}`,
         langRestrict,
         hl: 'pt-BR',
+        printType: 'books',
         maxResults,
         startIndex,
       });
@@ -159,28 +187,39 @@ export async function searchBooksBySubject(
         throw new Error(`Erro na requisição por assunto: ${response.status}`);
       }
       const fbData: GoogleBooksResponse = await fbRes.json();
+      const rawFbItems = (fbData.items || []).map(sanitizeBookItem);
+      const items = filterPt(rawFbItems);
       return {
-        items: (fbData.items || []).map(sanitizeBookItem),
-        totalItems: fbData.totalItems || 0,
+        items,
+        totalItems: items.length,
       };
     }
 
     const data: GoogleBooksResponse = await response.json();
-    let items = (data.items || []).map(sanitizeBookItem);
+    let rawItems = (data.items || []).map(sanitizeBookItem);
+    let items = filterPt(rawItems);
 
-    // Se o retorno com subject: for vazio ou muito pequeno, tenta fallback de texto simples
-    if (items.length === 0) {
+    // Se o retorno com subject: for vazio ou insuficiente em português, tenta fallback com termo em texto
+    if (items.length < 3) {
       const fallbackUrl = buildUrl(BASE_URL, {
-        q: subject.trim(),
+        q: `livros ${subject.trim()}`,
         langRestrict,
         hl: 'pt-BR',
+        printType: 'books',
         maxResults,
         startIndex,
       });
       const fbRes = await fetch(fallbackUrl);
       if (fbRes.ok) {
         const fbData: GoogleBooksResponse = await fbRes.json();
-        items = (fbData.items || []).map(sanitizeBookItem);
+        const fbItems = filterPt((fbData.items || []).map(sanitizeBookItem));
+        // Combina sem duplicar
+        const existingIds = new Set(items.map((i) => i.id));
+        fbItems.forEach((fbItem) => {
+          if (!existingIds.has(fbItem.id)) {
+            items.push(fbItem);
+          }
+        });
       }
     }
 

@@ -76,6 +76,69 @@ export function getSearchSubjectTerm(category: string): string {
 }
 
 /**
+ * Mapeamento de termos de busca naturais em Português para cada categoria.
+ * Usar queries textuais em português na Google Books API com langRestrict=pt e printType=books
+ * produz resultados autênticos em língua portuguesa com qualidade muito superior a "subject:".
+ */
+const RECOMMENDATION_SEARCH_QUERIES: Record<string, string> = {
+  'ficção': 'livros ficção literatura brasileira romances',
+  'ficção científica': 'ficção científica literatura',
+  'fantasia': 'melhores livros fantasia literatura',
+  'distopia': 'distopia ficção literatura',
+  'romance': 'romance literatura ficção',
+  'suspense & thriller': 'suspense thriller policial literatura',
+  'mistério & policial': 'mistério policial literatura romance',
+  'terror & horror': 'livros terror horror suspense',
+  'biografia & memórias': 'livros de biografia brasileira',
+  'biografia': 'livros de biografia história',
+  'história': 'livros de história do brasil',
+  'filosofia': 'livros filosofia clássica reflexão',
+  'psicologia': 'livros psicologia mente humana comportamento',
+  'desenvolvimento pessoal': 'desenvolvimento pessoal autoajuda motivação',
+  'negócios & economia': 'livros negócios economia administração',
+  'tecnologia & programação': 'livros programação tecnologia computação',
+  'ciência': 'livros divulgação científica ciência',
+  'ciências sociais': 'livros ciências sociais sociedade',
+  'ciência política': 'ciência política sociedade brasil',
+  'arte & design': 'livros arte design criatividade',
+  'poesia': 'poesia brasileira poemas literatura',
+  'teatro & drama': 'teatro dramaturgia brasileira',
+  'ficção juvenil': 'literatura juvenil infanto juvenil',
+  'jovem adulto (ya)': 'jovem adulto literatura romance',
+  'quadrinhos & mangás': 'quadrinhos graphic novel brasil',
+  'educação': 'educação pedagogia livros',
+  'saúde & bem-estar': 'saúde bem estar vida saudável',
+  'religião & espiritualidade': 'espiritualidade reflexão filosofia',
+  'gastronomia & culinária': 'culinária gastronomia receitas brasil',
+  'viagens & turismo': 'livros viagens turismo cultura',
+  'clássicos': 'clássicos da literatura brasileira',
+  'literatura': 'literatura brasileira clássicos romances',
+  'geral': 'clássicos da literatura brasileira',
+};
+
+/**
+ * Retorna uma query de busca otimizada em Português para recomendações baseadas em uma categoria
+ */
+export function getRecommendationSearchQuery(category: string): string {
+  const normalized = normalizeCategoryName(category).toLowerCase().trim();
+  
+  if (RECOMMENDATION_SEARCH_QUERIES[normalized]) {
+    return RECOMMENDATION_SEARCH_QUERIES[normalized];
+  }
+
+  // Tenta correspondência parcial por chave
+  for (const [key, query] of Object.entries(RECOMMENDATION_SEARCH_QUERIES)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return query;
+    }
+  }
+
+  const cleanName = normalizeCategoryName(category);
+  return `livros de ${cleanName} em português`;
+}
+
+
+/**
  * Retorna uma paleta de cor temática para categorias
  */
 export function getCategoryColor(category: string): { bg: string; text: string; border: string } {

@@ -86,14 +86,17 @@ export const PatternsInsightCard: React.FC<PatternsInsightCardProps> = ({
 
         <div className="flex flex-wrap gap-2">
           {topCategories.map((cat) => {
-            const isSelected = (activeCategory || primary?.name) === cat.name;
+            const isSelected =
+              activeCategory === cat.name ||
+              activeCategory === cat.displayName ||
+              (!activeCategory && (primary?.name === cat.name || primary?.displayName === cat.displayName));
             return (
               <div key={cat.name} className="flex items-center">
                 <CategoryBadge
-                  category={cat.name}
+                  category={cat.displayName || cat.name}
                   selected={isSelected}
                   isLoading={isLoading}
-                  onClick={() => onSelectCategory(cat.name)}
+                  onClick={() => onSelectCategory(cat.displayName || cat.name)}
                 />
                 <span className="ml-1 text-[11px] font-medium text-[#8C7D73]">
                   {cat.count}x ({cat.percentage}%)
